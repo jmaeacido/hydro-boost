@@ -566,14 +566,22 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   gap: 48px;
   align-items: center;
 }
+.meet {
+  align-items: start;
+}
 .showcase-product {
   justify-self: center;
-  width: clamp(260px, 36vw, 440px);
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  width: clamp(220px, 22vw, 300px);
 }
 .showcase-product img {
   width: 100%;
   height: auto;
+  max-height: 100%;
   object-fit: contain;
+  object-position: top center;
   box-shadow: var(--shadow);
   border-left: 4px solid var(--lime);
 }
@@ -1041,8 +1049,25 @@ select {
   letter-spacing: 0;
 }
 
-.product-images { display: grid; gap: 14px; }
-.spin-product { box-shadow: var(--shadow); border-left: 4px solid var(--lime); }
+.product-images {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.spin-product {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: calc(100% - 92px);
+  object-fit: contain;
+  object-position: top center;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--lime);
+}
+.product {
+  align-items: start;
+}
 .buy-panel { padding: 28px; position: sticky; top: 20px; border-left: 3px solid var(--orange); }
 .flavor { width: fit-content; margin: 16px 0; }
 .flavor span { width: 16px; height: 16px; background: var(--gold); clip-path: circle(50%); }
@@ -1165,8 +1190,9 @@ select {
     height: min(84vw, 440px);
   }
   .showcase-product {
+    align-self: center;
     justify-self: center;
-    width: min(72vw, 360px);
+    width: min(58vw, 280px);
   }
   h1 { max-width: none; margin-inline: auto; }
   h1 em { display: block; }
@@ -1180,6 +1206,11 @@ select {
   .compare-row > :first-child { grid-column: 1 / -1; background: rgba(255,255,255,.03); font-weight: 800; }
   .gallery, .split-grid, .pricing-grid { grid-template-columns: 1fr; }
   .buy-panel { position: static; }
+  .product-images {
+    align-self: center;
+    width: min(72vw, 360px);
+  }
+  .spin-product { max-height: none; width: 100%; }
   .calc-gauge-wrap { grid-template-columns: 1fr; justify-items: center; text-align: center; }
   .calc-result { text-align: center; }
   .bar-row { grid-template-columns: 80px 1fr 60px; }
@@ -1191,7 +1222,7 @@ select {
   h1 { font-size: clamp(2.8rem, 12vw, 4rem); }
   h2 { font-size: clamp(2rem, 10vw, 3.2rem); }
   .hero-product { width: min(88vw, 360px); height: min(88vw, 360px); }
-  .showcase-product { width: min(75vw, 280px); }
+  .showcase-product { width: min(62vw, 240px); }
   .hero-stats { grid-template-columns: repeat(3, 1fr); max-width: 100%; }
   .situation-grid, .benefit-grid, .ingredient-grid, .timeline { grid-template-columns: 1fr; }
   .situation, .benefit, .price { min-height: 170px; }
