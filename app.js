@@ -4,8 +4,29 @@ const tiltTarget = document.querySelector("[data-tilt]");
 const calc = document.querySelector("[data-calc]");
 const gaugeRing = document.querySelector("[data-gauge-ring]");
 const reviewShell = document.querySelector("[data-review-shell]");
-const GAE_MAX_OZ = 200;
+const GAE_MAX_OZ = 250;
 const GAE_CIRC = 327;
+
+// Evidence-based hydration model:
+// - Baseline: 35 mL/kg/day (clinical weight-scaled guideline; NASEM AI ≈ 74–101 oz from beverages).
+// - Exercise: ACSM 0.4–0.8 L/h by intensity, scaled for climate, capped at 80% of estimated sweat loss.
+// - Gummies: partial sodium replacement from estimated sweat losses (NATA sweat sodium range), per 150 mg/gummy.
+const HYDRATION = {
+  ML_PER_KG_BASE: 35,
+  LB_TO_KG: 0.453592,
+  ML_PER_OZ: 29.5735,
+  EXERCISE_L_PER_HR: { light: 0.4, moderate: 0.6, high: 0.8 },
+  CLIMATE_MULT: { cool: 1, warm: 1.15, hot: 1.3 },
+  EXERCISE_REPLACE_RATIO: 0.8,
+  SHORT_SESSION_MIN: 30,
+  SHORT_SESSION_FACTOR: 0.5,
+  ACTIVE_DAY_BONUS_OZ: { light: 0, moderate: 12, high: 20 },
+  SWEAT_NA_MG_PER_L: 800,
+  NA_REPLACE_RATIO: 0.5,
+  NA_PER_GUMMY_MG: 150,
+  GUMMY_MIN: 1,
+  GUMMY_MAX: 4
+};
 
 const reviews = [
   {
@@ -128,6 +149,52 @@ if (reviewShell) {
 }
 startReviewTimer();
 
+function mlToOz(ml) {
+  return ml / HYDRATION.ML_PER_OZ;
+}
+
+function baselineOz(weightLb) {
+  return mlToOz(weightLb * HYDRATION.LB_TO_KG * HYDRATION.ML_PER_KG_BASE);
+}
+
+function exerciseOz(activity, climate, durationMin) {
+  if (durationMin <= 0) return 0;
+  const hours = durationMin / 60;
+  let liters = HYDRATION.EXERCISE_L_PER_HR[activity] * HYDRATION.CLIMATE_MULT[climate] * hours;
+  if (durationMin < HYDRATION.SHORT_SESSION_MIN) {
+    liters *= HYDRATION.SHORT_SESSION_FACTOR;
+  }
+  return mlToOz(liters * 1000 * HYDRATION.EXERCISE_REPLACE_RATIO);
+}
+
+function recommendGummies(activity, climate, durationMin) {
+  if (durationMin <= 0) {
+    return "1–2 gummies for daily support (per label)";
+  }
+
+  const hours = durationMin / 60;
+  const sweatLiters = HYDRATION.EXERCISE_L_PER_HR[activity] * HYDRATION.CLIMATE_MULT[climate] * hours;
+  const targetNaMg = sweatLiters * HYDRATION.SWEAT_NA_MG_PER_L * HYDRATION.NA_REPLACE_RATIO;
+  const count = Math.min(
+    HYDRATION.GUMMY_MAX,
+    Math.max(HYDRATION.GUMMY_MIN, Math.ceil(targetNaMg / HYDRATION.NA_PER_GUMMY_MG))
+  );
+  const low = Math.max(HYDRATION.GUMMY_MIN, count - 1);
+  const high = Math.min(HYDRATION.GUMMY_MAX, count + 1);
+  const sodiumMg = count * HYDRATION.NA_PER_GUMMY_MG;
+
+  if (low === high) {
+    return `${count} gumm${count === 1 ? "y" : "ies"} around training (~${sodiumMg} mg sodium)`;
+  }
+  return `${low}–${high} gummies around training (~${low * HYDRATION.NA_PER_GUMMY_MG}–${high * HYDRATION.NA_PER_GUMMY_MG} mg sodium)`;
+}
+
+function trainingDayOz(weightLb, activity, climate, durationMin) {
+  return baselineOz(weightLb)
+    + HYDRATION.ACTIVE_DAY_BONUS_OZ[activity]
+    + exerciseOz(activity, climate, durationMin);
+}
+
 function updateGauge(ounces) {
   if (!gaugeRing) return;
   const pct = Math.min(ounces / GAE_MAX_OZ, 1);
@@ -137,21 +204,14 @@ function updateGauge(ounces) {
 function updateCalc() {
   if (!calc) return;
   const weight = Number(calc.weight.value);
-  const activity = Number(calc.activity.value);
-  const climate = Number(calc.climate.value);
+  const activity = calc.activity.value;
+  const climate = calc.climate.value;
   const duration = Number(calc.duration.value);
-  const ounces = Math.round((weight * 0.55 * activity * climate) + (duration * 0.22));
+  const ounces = Math.round(trainingDayOz(weight, activity, climate, duration));
   calc.querySelector("[data-weight-out]").textContent = `${weight} lb`;
   calc.querySelector("[data-duration-out]").textContent = `${duration} min`;
   calc.querySelector("[data-ounces]").textContent = ounces;
-  const gummyEl = calc.querySelector("[data-gummies]");
-  if (duration > 60) {
-    gummyEl.textContent = "3–4 gummies around training";
-  } else if (duration > 0) {
-    gummyEl.textContent = "2–3 gummies around training";
-  } else {
-    gummyEl.textContent = "1–2 gummies for daily support";
-  }
+  calc.querySelector("[data-gummies]").textContent = recommendGummies(activity, climate, duration);
   updateGauge(ounces);
 }
 calc?.addEventListener("input", updateCalc);

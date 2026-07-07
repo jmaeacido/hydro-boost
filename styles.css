@@ -181,8 +181,8 @@ button, input, select { font: inherit; }
   position: relative;
   z-index: 2;
   justify-self: end;
-  width: clamp(260px, 36vw, 440px);
-  height: clamp(260px, 36vw, 440px);
+  width: clamp(300px, 46vw, 560px);
+  height: clamp(300px, 46vw, 560px);
   transform-style: preserve-3d;
 }
 
@@ -1031,6 +1031,15 @@ select {
 }
 .calc-result span, .calc-result small { color: var(--muted); font-weight: 600; }
 .calc-result small { display: block; margin-top: 6px; color: var(--orange); font-weight: 700; text-transform: uppercase; font-size: .72rem; letter-spacing: .08em; }
+.calc-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: .72rem;
+  line-height: 1.5;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
 
 .product-images { display: grid; gap: 14px; }
 .spin-product { box-shadow: var(--shadow); border-left: 4px solid var(--lime); }
@@ -1152,8 +1161,8 @@ select {
     grid-area: auto;
     justify-self: center;
     order: 2;
-    width: min(72vw, 360px);
-    height: min(72vw, 360px);
+    width: min(84vw, 440px);
+    height: min(84vw, 440px);
   }
   .showcase-product {
     justify-self: center;
@@ -1181,7 +1190,7 @@ select {
   .hero { min-height: auto; padding-bottom: 64px; gap: 16px; }
   h1 { font-size: clamp(2.8rem, 12vw, 4rem); }
   h2 { font-size: clamp(2rem, 10vw, 3.2rem); }
-  .hero-product { width: min(75vw, 280px); height: min(75vw, 280px); }
+  .hero-product { width: min(88vw, 360px); height: min(88vw, 360px); }
   .showcase-product { width: min(75vw, 280px); }
   .hero-stats { grid-template-columns: repeat(3, 1fr); max-width: 100%; }
   .situation-grid, .benefit-grid, .ingredient-grid, .timeline { grid-template-columns: 1fr; }
