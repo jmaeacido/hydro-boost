@@ -157,17 +157,6 @@ function updateCalc() {
 calc?.addEventListener("input", updateCalc);
 updateCalc();
 
-let quantity = 1;
-const qtyOut = document.querySelector("[data-qty]");
-document.querySelector("[data-qty-minus]")?.addEventListener("click", () => {
-  quantity = Math.max(1, quantity - 1);
-  qtyOut.textContent = quantity;
-});
-document.querySelector("[data-qty-plus]")?.addEventListener("click", () => {
-  quantity = Math.min(12, quantity + 1);
-  qtyOut.textContent = quantity;
-});
-
 document.querySelectorAll(".magnetic").forEach((el) => {
   el.addEventListener("pointermove", (event) => {
     const rect = el.getBoundingClientRect();
@@ -196,6 +185,20 @@ const barObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll(".electrolyte-bars").forEach((el) => barObserver.observe(el));
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+document.querySelectorAll(".gallery-card--hover-video").forEach((card) => {
+  const video = card.querySelector(".gallery-video");
+  if (!video || reduceMotion) return;
+  const startAt = Number(video.dataset.start || 0);
+  card.addEventListener("mouseenter", () => {
+    video.currentTime = startAt;
+    video.play().catch(() => {});
+  });
+  card.addEventListener("mouseleave", () => {
+    video.pause();
+    video.currentTime = startAt;
+  });
+});
 
 const lottieTargets = document.querySelectorAll(".icon-lottie[data-src]");
 if (lottieTargets.length && window.lottie) {
