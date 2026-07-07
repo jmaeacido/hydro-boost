@@ -883,6 +883,8 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 }
 .bar-fill.accent { background: linear-gradient(90deg, var(--orange), var(--gold)); }
 
+.reviews { display: none; }
+
 .review-shell {
   min-height: 300px;
   display: grid;
