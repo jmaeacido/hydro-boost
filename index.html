@@ -24,7 +24,10 @@
   <main id="top">
     <section class="hero section" aria-labelledby="hero-title">
       <div class="hero-bg" aria-hidden="true">
-        <img class="hero-bg-img" src="assets/ad-reference.png" alt="">
+        <video class="hero-bg-video" autoplay muted loop playsinline preload="metadata" poster="assets/ad-reference.png">
+          <source src="assets/Hero video.mp4" type="video/mp4">
+        </video>
+        <img class="hero-bg-img hero-bg-img--fallback" src="assets/ad-reference.png" alt="">
         <div class="hero-bg-overlay"></div>
         <span class="hero-slash"></span>
       </div>
@@ -38,7 +41,7 @@
         <h1 id="hero-title"><span class="h1-line">Hydrate Smarter.</span><em>Perform Better.</em></h1>
         <p class="hero-sub">Electrolytes. Adaptogens. No bottle. No powder. Just chew and go.</p>
         <div class="cta-row">
-          <a class="button primary magnetic" href="https://www.buyhydroboost.com/product-page/hydro-boost" target="_blank" rel="noopener noreferrer">Fuel Up</a>
+          <a class="button primary magnetic" href="https://www.buyhydroboost.com/product-page/hydro-boost">Fuel Up</a>
           <a class="button secondary magnetic" href="#inside">See Formula</a>
         </div>
         <div class="hero-stats" aria-label="Performance stats">
@@ -56,12 +59,54 @@
           </div>
         </div>
       </div>
-      <div class="hero-product" data-tilt aria-label="Hydro Boost bottle">
-        <img src="assets/hero-bottle-gummies.png" alt="Hydro Boost lemon lime electrolyte gummies bottle with gummies" width="1024" height="1024">
-        <span class="rim"></span>
-        <span class="gummy g1"></span>
-        <span class="gummy g2"></span>
-        <span class="gummy g3"></span>
+      <div class="hero-product" data-hero-interactive aria-label="Hydro Boost bottle with interactive formula ingredients">
+        <div class="hero-product-stage">
+          <div class="hero-product-aura" aria-hidden="true"></div>
+          <div class="hero-orbit-ring" aria-hidden="true"></div>
+          <svg class="hero-formula-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <line class="hero-link hero-link--cordyceps" x1="50" y1="50" x2="18" y2="16"></line>
+            <line class="hero-link hero-link--magnesium" x1="50" y1="50" x2="50" y2="4"></line>
+            <line class="hero-link hero-link--sodium" x1="50" y1="50" x2="82" y2="16"></line>
+            <line class="hero-link hero-link--maca" x1="50" y1="50" x2="14" y2="58"></line>
+            <line class="hero-link hero-link--potassium" x1="50" y1="50" x2="86" y2="62"></line>
+          </svg>
+          <div class="hero-ingredients" role="group" aria-label="Formula ingredients">
+            <button type="button" class="hero-ingredient hero-ingredient--cordyceps" data-name="Cordyceps" data-desc="A rare high-altitude fungus prized in traditional wellness for vitality and endurance.">
+              <span class="hero-ingredient-ring" aria-hidden="true"></span>
+              <span class="hero-ingredient-media"><img src="assets/ingredients/cordyceps.jpg" alt="" width="160" height="160" loading="lazy"></span>
+              <span class="hero-ingredient-name">Cordyceps</span>
+            </button>
+            <button type="button" class="hero-ingredient hero-ingredient--magnesium" data-name="Magnesium" data-desc="An essential mineral from nuts and greens that supports muscle function and nerve signaling.">
+              <span class="hero-ingredient-ring" aria-hidden="true"></span>
+              <span class="hero-ingredient-media"><img src="assets/ingredients/magnesium.jpg" alt="" width="160" height="160" loading="lazy"></span>
+              <span class="hero-ingredient-name">Magnesium</span>
+            </button>
+            <button type="button" class="hero-ingredient hero-ingredient--sodium" data-name="Sodium" data-desc="A key electrolyte from salt that helps regulate fluid balance when you sweat.">
+              <span class="hero-ingredient-ring" aria-hidden="true"></span>
+              <span class="hero-ingredient-media"><img src="assets/ingredients/sodium.jpg" alt="" width="160" height="160" loading="lazy"></span>
+              <span class="hero-ingredient-name">Sodium</span>
+            </button>
+            <button type="button" class="hero-ingredient hero-ingredient--maca" data-name="Black Maca" data-desc="A hardy Peruvian root cultivated in the Andes for centuries as a natural source of energy.">
+              <span class="hero-ingredient-ring" aria-hidden="true"></span>
+              <span class="hero-ingredient-media"><img src="assets/ingredients/maca.png" alt="" width="160" height="160" loading="lazy"></span>
+              <span class="hero-ingredient-name">Black Maca</span>
+            </button>
+            <button type="button" class="hero-ingredient hero-ingredient--potassium" data-name="Potassium" data-desc="A mineral from fruits and vegetables that pairs with sodium to support cellular hydration.">
+              <span class="hero-ingredient-ring" aria-hidden="true"></span>
+              <span class="hero-ingredient-media"><img src="assets/ingredients/potassium.jpg" alt="" width="160" height="160" loading="lazy"></span>
+              <span class="hero-ingredient-name">Potassium</span>
+            </button>
+          </div>
+          <div class="hero-product-visual">
+            <img class="hero-product-img" data-tilt src="assets/hero-bottle-gummies_dark.png" alt="Hydro Boost lemon lime electrolyte gummies bottle with gummies" width="1024" height="1024">
+          </div>
+        </div>
+        <div class="hero-formula-panel" aria-live="polite">
+          <p class="hero-formula-eyebrow">Inside every gummy</p>
+          <p class="hero-formula-name" data-hero-formula-name>Explore the formula</p>
+          <p class="hero-formula-copy" data-hero-formula-copy>Hover an ingredient to see what powers Hydro Boost.</p>
+        </div>
+        <p class="hero-ingredient-hint">Hover the bottle to reveal ingredients</p>
       </div>
       <a class="scroll-cue" href="#problem" aria-label="Scroll to next section"><span></span></a>
     </section>
@@ -160,7 +205,7 @@
     <section class="section comparison slice" id="comparison" aria-labelledby="comparison-title">
       <div class="section-head reveal">
         <p class="eyebrow">Spec sheet</p>
-        <h2 id="comparison-title">Why athletes choose gummies.</h2>
+        <h2 id="comparison-title">Why gummies beat the bottle.</h2>
       </div>
       <div class="compare-table reveal" role="table" aria-label="Hydro Boost comparison">
         <div class="compare-row compare-head" role="row">
@@ -212,29 +257,32 @@
         <h2 id="inside-title">Every mg counts.</h2>
       </div>
       <div class="ingredient-grid">
-        <button class="ingredient active reveal" type="button" data-info="Supports stamina and endurance for high-output training blocks." data-dose="500 mg">
+        <button class="ingredient active reveal" type="button" data-what="Black maca is a hardy root vegetable grown in the high-altitude plateaus of the Peruvian Andes. Indigenous communities have cultivated and eaten it for centuries as a natural source of energy and stamina." data-info="Supports stamina and endurance for high-output training blocks." data-dose="500 mg">
           <span class="ingredient-photo"><img src="assets/ingredients/maca.png" alt="Black maca root and powder" width="80" height="80" loading="lazy"></span>
           <b>Black Maca</b><small>Performance adaptogen</small><em class="dose">500 mg</em>
         </button>
-        <button class="ingredient reveal" type="button" data-info="Functional mushroom linked to energy and endurance support." data-dose="200 mg">
+        <button class="ingredient reveal" type="button" data-what="Cordyceps is a rare fungus found in the high mountains of Tibet and China. Traditional healers have used it for centuries as a natural tonic for energy and physical resilience." data-info="Functional mushroom linked to energy and endurance support." data-dose="200 mg">
           <span class="ingredient-photo"><img src="assets/ingredients/cordyceps.jpg" alt="Cordyceps mushroom" width="80" height="80" loading="lazy"></span>
           <b>Cordyceps</b><small>Endurance support</small><em class="dose">200 mg</em>
         </button>
-        <button class="ingredient reveal" type="button" data-info="Essential mineral for muscle function and nerve signaling." data-dose="80 mg">
+        <button class="ingredient reveal" type="button" data-what="Magnesium is an essential mineral your body cannot make on its own — it comes from foods like nuts, seeds, leafy greens, and whole grains. It is involved in hundreds of processes, from muscle contractions to nerve signaling." data-info="Essential mineral for muscle function and nerve signaling." data-dose="80 mg">
           <span class="ingredient-photo"><img src="assets/ingredients/magnesium.jpg" alt="Magnesium-rich nuts, seeds, and avocado" width="80" height="80" loading="lazy"></span>
           <b>Magnesium</b><small>Muscle support</small><em class="dose">80 mg</em>
         </button>
-        <button class="ingredient reveal" type="button" data-info="Key electrolyte for fluid balance during intense effort." data-dose="150 mg">
+        <button class="ingredient reveal" type="button" data-what="Sodium is one of the body's primary electrolytes, most commonly obtained from salt in food and fluids. Your cells rely on it to regulate fluid balance — especially when you sweat during activity." data-info="Key electrolyte for fluid balance during intense effort." data-dose="150 mg">
           <span class="ingredient-photo"><img src="assets/ingredients/sodium.jpg" alt="Sea salt crystals and mineral salts" width="80" height="80" loading="lazy"></span>
           <b>Sodium</b><small>Fluid balance</small><em class="dose">150 mg</em>
         </button>
-        <button class="ingredient reveal" type="button" data-info="Works with sodium to support hydration at the cellular level." data-dose="100 mg">
+        <button class="ingredient reveal" type="button" data-what="Potassium is an essential mineral and electrolyte found naturally in bananas, potatoes, avocados, and leafy greens. It works alongside sodium to help maintain fluid balance inside and outside your cells." data-info="Works with sodium to support hydration at the cellular level." data-dose="100 mg">
           <span class="ingredient-photo"><img src="assets/ingredients/potassium.jpg" alt="Potassium-rich whole foods" width="80" height="80" loading="lazy"></span>
           <b>Potassium</b><small>Electrolyte support</small><em class="dose">100 mg</em>
         </button>
       </div>
-      <p class="ingredient-detail reveal" data-ingredient-detail>Supports stamina and endurance for high-output training blocks.</p>
-      <p class="ingredient-dose reveal" data-ingredient-dose>500 mg per serving</p>
+      <div class="ingredient-panel reveal">
+        <p class="ingredient-about" data-ingredient-about>Black maca is a hardy root vegetable grown in the high-altitude plateaus of the Peruvian Andes. Indigenous communities have cultivated and eaten it for centuries as a natural source of energy and stamina.</p>
+        <p class="ingredient-detail" data-ingredient-detail>Supports stamina and endurance for high-output training blocks.</p>
+        <p class="ingredient-dose" data-ingredient-dose>500 mg per serving</p>
+      </div>
     </section>
 
     <section class="section lifestyle slice" aria-labelledby="lifestyle-title">
@@ -361,7 +409,7 @@
 
     <section class="section product slice-alt" id="product" aria-labelledby="product-title">
       <div class="product-images reveal">
-        <img class="spin-product" src="assets/hero-bottle-gummies.png" alt="Hydro Boost front product bottle" loading="lazy">
+        <img class="spin-product" src="assets/magnific_BmVE7froQR.png" alt="Hydro Boost front product bottle" loading="lazy">
       </div>
       <div class="buy-panel reveal">
         <p class="eyebrow">Product</p>
@@ -373,7 +421,7 @@
           <span>Recovery</span>
         </div>
         <div class="flavor"><span></span>Lemon Lime</div>
-        <a class="button primary magnetic add-cart" href="https://www.buyhydroboost.com/product-page/hydro-boost" target="_blank" rel="noopener noreferrer">Fuel Up</a>
+        <a class="button primary magnetic add-cart" href="https://www.buyhydroboost.com/product-page/hydro-boost">Fuel Up</a>
       </div>
     </section>
 
@@ -383,18 +431,17 @@
         <h2 id="faq-title">Quick answers.</h2>
       </div>
       <div class="accordion reveal">
-        <details open><summary>When should I take Hydro Boost?</summary><p>1–4 gummies during activity or 1–2 daily for maintenance. Follow the product label.</p></details>
-        <details><summary>Does it replace water?</summary><p>No — it's a hydration companion. Drink water throughout the day, especially during training.</p></details>
-        <details><summary>What flavor is it?</summary><p>Lemon lime with a bright citrus bite — no chalky finish.</p></details>
-        <details><summary>Is it gym-bag ready?</summary><p>Yes. Pocket-sized, no mixing, no spills, no shaker required.</p></details>
-        <details><summary>What is Hydro Boost?</summary><p>Hydro Boost is an electrolyte gummy that delivers the hydration benefits of a full sports drink in a convenient, chewable gummy. It provides essential electrolytes that help replenish what your body loses through sweat and daily activity, without the need for bottles, powders, or mixing. Whether you're working out, traveling, working outdoors, or simply staying active, Hydro Boost makes hydration simple, portable, and enjoyable.</p></details>
-        <details><summary>How is Hydro Boost different from traditional sports drinks?</summary><p>Hydro Boost provides the essential electrolytes your body needs in a compact gummy instead of a large bottle of liquid. Unlike many traditional sports drinks that contain high amounts of sugar and require you to carry bulky bottles, Hydro Boost offers a cleaner, more convenient way to stay hydrated. You simply chew a gummy whenever you need hydration support, making it ideal for active lifestyles and people on the go.</p></details>
-        <details><summary>What are the benefits of taking Hydro Boost?</summary><p>Hydro Boost helps replenish essential electrolytes that support proper hydration and fluid balance. Staying hydrated helps your body perform at its best, whether you're exercising, working, traveling, or enjoying outdoor activities. Its portable gummy format also makes it easier to stay consistent with your hydration routine wherever life takes you.</p></details>
+        <details open><summary>What is Hydro Boost?</summary><p>Hydro Boost is an electrolyte gummy that delivers the hydration benefits of a full sports drink in a convenient, chewable gummy. It provides essential electrolytes that help replenish what your body loses through sweat and daily activity, without the need for bottles, powders, or mixing. Whether you're working out, traveling, working outdoors, or simply staying active, Hydro Boost makes hydration simple, portable, and enjoyable.</p></details>
         <details><summary>Who should use Hydro Boost?</summary><p>Hydro Boost is designed for anyone who wants a convenient way to maintain proper hydration. It is especially beneficial for athletes, fitness enthusiasts, runners, hikers, cyclists, outdoor workers, frequent travelers, and individuals with busy lifestyles who need a quick and effective hydration solution without carrying sports drinks everywhere.</p></details>
+        <details><summary>What are the benefits of taking Hydro Boost?</summary><p>Hydro Boost helps replenish essential electrolytes that support proper hydration and fluid balance. Staying hydrated helps your body perform at its best, whether you're exercising, working, traveling, or enjoying outdoor activities. Its portable gummy format also makes it easier to stay consistent with your hydration routine wherever life takes you.</p></details>
+        <details><summary>How is Hydro Boost different from traditional sports drinks?</summary><p>Hydro Boost provides the essential electrolytes your body needs in a compact gummy instead of a large bottle of liquid. Unlike many traditional sports drinks that contain high amounts of sugar and require you to carry bulky bottles, Hydro Boost offers a cleaner, more convenient way to stay hydrated. You simply chew a gummy whenever you need hydration support, making it ideal for active lifestyles and people on the go.</p></details>
         <details><summary>When should I take Hydro Boost?</summary><p>Hydro Boost can be taken before, during, or after physical activity to help support hydration. It is also an excellent choice while traveling, working outdoors, spending time in hot weather, or anytime you need to replenish electrolytes and maintain hydration throughout the day.</p></details>
+        <details><summary>Does it replace water?</summary><p>No — it's a hydration companion. Drink water throughout the day, especially during training.</p></details>
         <details><summary>What electrolytes does Hydro Boost contain?</summary><p>Hydro Boost contains three essential electrolytes: sodium, potassium, and magnesium. These minerals play an important role in maintaining fluid balance, supporting normal muscle function, and helping your body replace electrolytes lost through sweat and physical activity.</p></details>
-        <details><summary>Is Hydro Boost easy to carry while traveling or exercising?</summary><p>Absolutely. Hydro Boost is specifically designed for portability. Its gummy format fits easily into your gym bag, backpack, purse, or pocket, allowing you to enjoy hydration support anytime without carrying heavy bottles or measuring powders.</p></details>
         <details><summary>Does Hydro Boost contain sugar?</summary><p>No. Hydro Boost contains 0 grams of sugar, making it a smart alternative to many traditional sports drinks that rely on added sugars. You receive the hydration support your body needs without the sugar overload or the crash that often follows sugary beverages.</p></details>
+        <details><summary>What flavor is it?</summary><p>Lemon lime with a bright citrus bite — no chalky finish.</p></details>
+        <details><summary>Is Hydro Boost easy to carry while traveling or exercising?</summary><p>Absolutely. Hydro Boost is specifically designed for portability. Its gummy format fits easily into your gym bag, backpack, purse, or pocket, allowing you to enjoy hydration support anytime without carrying heavy bottles or measuring powders.</p></details>
+        <details><summary>Is it gym bag ready?</summary><p>Yes. Pocket-sized, no mixing, no spills, no shaker required.</p></details>
         <details><summary>What is your return and refund policy?</summary><p>Customer satisfaction is important to us. Unopened and unused products may be returned within 14 days of delivery, provided they remain in their original packaging and in resalable condition. Once the returned item is received and inspected, eligible refunds will be processed to the original payment method. Please note that opened or used products cannot be returned for health and safety reasons.</p></details>
         <details><summary>How is my personal information protected?</summary><p>Your privacy is a priority. Personal information is collected only to process orders, provide customer support, improve your shopping experience, and communicate important updates regarding your purchase. Hydro Boost uses appropriate security measures to safeguard your information and does not sell your personal data to third parties. Customers may also request access to, correction of, or deletion of their personal information in accordance with applicable privacy laws.</p></details>
       </div>
@@ -407,13 +454,61 @@
       </div>
       <div class="final-copy reveal">
         <h2 id="final-title">Don't Let Hydration Slow Your PR.</h2>
-        <a class="button primary magnetic" href="https://www.buyhydroboost.com/product-page/hydro-boost" target="_blank" rel="noopener noreferrer">Fuel Up</a>
+        <a class="button primary magnetic" href="https://www.buyhydroboost.com/product-page/hydro-boost">Fuel Up</a>
       </div>
-      <img class="final-product" src="assets/hero-bottle-gummies.png" alt="Hydro Boost bottle" loading="lazy">
+      <img class="final-product" src="assets/magnific_BmVE7froQR.png" alt="Hydro Boost bottle" loading="lazy">
     </section>
   </main>
 
-  <a class="sticky-buy" href="https://www.buyhydroboost.com/product-page/hydro-boost" target="_blank" rel="noopener noreferrer">Fuel Up</a>
+  <footer class="site-footer" aria-labelledby="footer-brand-title">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="footer-accent" aria-hidden="true"></span>
+          <p class="footer-brand-title" id="footer-brand-title">Hydro Boost</p>
+          <p class="footer-brand-tag">Electrolytes + adaptogens</p>
+          <p class="footer-brand-copy">Performance hydration in a pocket-sized gummy. No bottle. No powder. Just chew and go.</p>
+        </div>
+
+        <nav class="footer-col" aria-label="Quick links">
+          <h2 class="footer-heading">Quick Links</h2>
+          <ul class="footer-links">
+            <li><a href="#top">Home</a></li>
+            <li><a href="https://www.buyhydroboost.com/product-page/hydro-boost">Product Page</a></li>
+            <li><a href="https://www.buyhydroboost.com/contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <nav class="footer-col" aria-label="Legal">
+          <h2 class="footer-heading">Legal</h2>
+          <ul class="footer-links">
+            <li><a href="https://www.buyhydroboost.com/terms-and-conditions">Terms of Service</a></li>
+            <li><a href="https://www.buyhydroboost.com/privacy-policy">Privacy Policy</a></li>
+            <li><a href="https://www.buyhydroboost.com/refund-policy">Refund &amp; Returns Policy</a></li>
+          </ul>
+        </nav>
+
+        <div class="footer-newsletter">
+          <h2 class="footer-newsletter-title">Be the First to Know</h2>
+          <p class="footer-newsletter-copy">Get inspiration, new arrivals and the latest offers straight to your inbox.</p>
+          <form class="footer-form" data-footer-form novalidate>
+            <label class="footer-field" for="footer-email">
+              <span class="footer-field-label">Email <span aria-hidden="true">*</span></span>
+              <input id="footer-email" name="email" type="email" autocomplete="email" required>
+            </label>
+            <label class="footer-check">
+              <input type="checkbox" name="subscribe" required>
+              <span>Yes, subscribe me to your newsletter.</span>
+            </label>
+            <button type="submit" class="footer-submit">Submit</button>
+            <p class="footer-form-status" role="status" aria-live="polite" hidden></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <a class="sticky-buy" href="https://www.buyhydroboost.com/product-page/hydro-boost">Fuel Up</a>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="app.js" defer></script>
 </body>

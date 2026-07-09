@@ -1,6 +1,7 @@
 const revealItems = document.querySelectorAll(".reveal");
 const counters = document.querySelectorAll("[data-count]");
 const tiltTarget = document.querySelector("[data-tilt]");
+const heroInteractive = document.querySelector("[data-hero-interactive]");
 const calc = document.querySelector("[data-calc]");
 const gaugeRing = document.querySelector("[data-gauge-ring]");
 const reviewShell = document.querySelector("[data-review-shell]");
@@ -95,10 +96,77 @@ if (tiltTarget) {
   });
 }
 
+if (heroInteractive) {
+  const heroIngredients = heroInteractive.querySelectorAll(".hero-ingredient");
+  const formulaName = heroInteractive.querySelector("[data-hero-formula-name]");
+  const formulaCopy = heroInteractive.querySelector("[data-hero-formula-copy]");
+  const touchMode = window.matchMedia("(hover: none)");
+  const defaultName = formulaName?.textContent || "";
+  const defaultCopy = formulaCopy?.textContent || "";
+
+  function setFormulaPanel(button) {
+    if (!formulaName || !formulaCopy || !button) return;
+    formulaName.textContent = button.dataset.name || defaultName;
+    formulaCopy.textContent = button.dataset.desc || defaultCopy;
+    heroInteractive.classList.add("has-selection");
+  }
+
+  function resetFormulaPanel() {
+    if (!formulaName || !formulaCopy) return;
+    formulaName.textContent = defaultName;
+    formulaCopy.textContent = defaultCopy;
+    heroInteractive.classList.remove("has-selection");
+  }
+
+  heroInteractive.addEventListener("mouseenter", () => {
+    heroInteractive.classList.add("is-exploring");
+  });
+
+  heroInteractive.addEventListener("mouseleave", () => {
+    heroInteractive.classList.remove("is-exploring");
+    heroIngredients.forEach((item) => item.classList.remove("is-focused"));
+    resetFormulaPanel();
+  });
+
+  heroInteractive.addEventListener("click", (event) => {
+    if (!touchMode.matches) return;
+    if (event.target.closest(".hero-ingredient")) return;
+    heroInteractive.classList.toggle("is-exploring");
+    heroIngredients.forEach((item) => item.classList.remove("is-focused"));
+    resetFormulaPanel();
+  });
+
+  heroIngredients.forEach((button) => {
+    button.addEventListener("mouseenter", () => setFormulaPanel(button));
+    button.addEventListener("focus", () => setFormulaPanel(button));
+
+    button.addEventListener("click", () => {
+      if (!touchMode.matches) return;
+      const isFocused = button.classList.contains("is-focused");
+      heroIngredients.forEach((item) => item.classList.remove("is-focused"));
+      heroInteractive.classList.add("is-exploring");
+      if (!isFocused) {
+        button.classList.add("is-focused");
+        setFormulaPanel(button);
+      } else {
+        resetFormulaPanel();
+      }
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!touchMode.matches || heroInteractive.contains(event.target)) return;
+    heroInteractive.classList.remove("is-exploring");
+    heroIngredients.forEach((item) => item.classList.remove("is-focused"));
+    resetFormulaPanel();
+  });
+}
+
 document.querySelectorAll(".ingredient").forEach((button) => {
   button.addEventListener("click", () => {
     document.querySelectorAll(".ingredient").forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
+    document.querySelector("[data-ingredient-about]").textContent = button.dataset.what;
     document.querySelector("[data-ingredient-detail]").textContent = button.dataset.info;
     document.querySelector("[data-ingredient-dose]").textContent = `${button.dataset.dose} per serving`;
   });
@@ -276,5 +344,33 @@ if (lottieTargets.length && window.lottie) {
         : undefined
     });
     if (reduceMotion) anim.goToAndStop(0, true);
+  });
+}
+
+const footerForm = document.querySelector("[data-footer-form]");
+if (footerForm) {
+  const status = footerForm.querySelector(".footer-form-status");
+  footerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const email = footerForm.elements.email;
+    const subscribe = footerForm.elements.subscribe;
+    if (!email.value.trim() || !email.checkValidity()) {
+      status.hidden = false;
+      status.className = "footer-form-status is-error";
+      status.textContent = "Enter a valid email address.";
+      email.focus();
+      return;
+    }
+    if (!subscribe.checked) {
+      status.hidden = false;
+      status.className = "footer-form-status is-error";
+      status.textContent = "Check the box to subscribe.";
+      subscribe.focus();
+      return;
+    }
+    status.hidden = false;
+    status.className = "footer-form-status is-success";
+    status.textContent = "Thanks — you're on the list.";
+    footerForm.reset();
   });
 }
