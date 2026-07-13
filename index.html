@@ -8,8 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="preload" href="assets/fonts/trajan-pro/TrajanPro-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="assets/ad-reference.png" as="image">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -37,7 +38,7 @@
           <span>30 Ct</span>
           <span>Zero Mixing</span>
         </div>
-        <p class="eyebrow">Electrolytes + adaptogens</p>
+        <p class="eyebrow">— Electrolytes &amp; Adaptogens —</p>
         <h1 id="hero-title"><span class="h1-line">Hydrate Smarter.</span><em>Perform Better.</em></h1>
         <p class="hero-sub">Electrolytes. Adaptogens. No bottle. No powder. Just chew and go.</p>
         <div class="cta-row">
@@ -63,12 +64,15 @@
         <div class="hero-product-stage">
           <div class="hero-product-aura" aria-hidden="true"></div>
           <div class="hero-orbit-ring" aria-hidden="true"></div>
+          <div class="hero-product-visual">
+            <img class="hero-product-img" src="assets/hero-bottle-gummies_dark.png" alt="Hydro Boost lemon lime electrolyte gummies bottle with gummies" width="1024" height="1024">
+          </div>
           <svg class="hero-formula-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <line class="hero-link hero-link--cordyceps" x1="50" y1="50" x2="18" y2="16"></line>
-            <line class="hero-link hero-link--magnesium" x1="50" y1="50" x2="50" y2="4"></line>
-            <line class="hero-link hero-link--sodium" x1="50" y1="50" x2="82" y2="16"></line>
-            <line class="hero-link hero-link--maca" x1="50" y1="50" x2="14" y2="58"></line>
-            <line class="hero-link hero-link--potassium" x1="50" y1="50" x2="86" y2="62"></line>
+            <line class="hero-link hero-link--cordyceps" x1="50" y1="52" x2="18" y2="20"></line>
+            <line class="hero-link hero-link--magnesium" x1="50" y1="52" x2="50" y2="14"></line>
+            <line class="hero-link hero-link--sodium" x1="50" y1="52" x2="82" y2="20"></line>
+            <line class="hero-link hero-link--maca" x1="50" y1="52" x2="14" y2="60"></line>
+            <line class="hero-link hero-link--potassium" x1="50" y1="52" x2="86" y2="64"></line>
           </svg>
           <div class="hero-ingredients" role="group" aria-label="Formula ingredients">
             <button type="button" class="hero-ingredient hero-ingredient--cordyceps" data-name="Cordyceps" data-desc="A rare high-altitude fungus prized in traditional wellness for vitality and endurance.">
@@ -97,9 +101,6 @@
               <span class="hero-ingredient-name">Potassium</span>
             </button>
           </div>
-          <div class="hero-product-visual">
-            <img class="hero-product-img" data-tilt src="assets/hero-bottle-gummies_dark.png" alt="Hydro Boost lemon lime electrolyte gummies bottle with gummies" width="1024" height="1024">
-          </div>
         </div>
         <div class="hero-formula-panel" aria-live="polite">
           <p class="hero-formula-eyebrow">Inside every gummy</p>
@@ -108,7 +109,23 @@
         </div>
         <p class="hero-ingredient-hint">Hover the bottle to reveal ingredients</p>
       </div>
-      <a class="scroll-cue" href="#problem" aria-label="Scroll to next section"><span></span></a>
+      <a class="scroll-cue" href="#in-motion" aria-label="Scroll to next section"><span></span></a>
+    </section>
+
+    <section class="section in-motion slice-alt" id="in-motion" aria-labelledby="in-motion-title">
+      <div class="in-motion-grid">
+        <div class="section-head in-motion-copy reveal">
+          <p class="eyebrow">In Motion</p>
+          <h2 id="in-motion-title">Every session counts.</h2>
+          <p>From warmup to final rep — this is the energy behind Hydro Boost. No overlays, no distractions. Just the grind.</p>
+          <a class="cta-link" href="#meet">Meet the product <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="in-motion-player reveal" data-motion-player>
+          <video class="in-motion-video" muted loop playsinline preload="metadata" poster="assets/ad-reference.png" aria-label="Hydro Boost training footage">
+            <source src="assets/Hero video.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
     </section>
 
     <section class="section slice problem" id="problem" aria-labelledby="problem-title">
@@ -182,22 +199,50 @@
           <h3>Travel</h3><p>Stay fueled on the move — no mixing.</p>
         </article>
       </div>
+      <p class="section-foot reveal">
+        <a class="cta-chip" href="https://www.buyhydroboost.com/product-page/hydro-boost">Fuel your next session</a>
+      </p>
     </section>
 
     <section class="section meet slice-alt" id="meet" aria-labelledby="meet-title">
-      <div class="showcase-product reveal">
-        <img src="assets/hero-bottle-dark.png" alt="Hydro Boost product bottle on reflective surface" loading="lazy" width="1024" height="1024">
-      </div>
-      <div class="meet-copy reveal">
-        <p class="eyebrow">Meet Hydro Boost</p>
-        <h2 id="meet-title">Performance hydration. Zero drag.</h2>
-        <p>Lemon lime gummies packed with electrolytes and adaptogens — built for pre-workout, intra-session, and recovery when bottles and scoops slow you down.</p>
-        <div class="ingredient-orbit" aria-label="Featured formula">
-          <span>Black Maca</span>
-          <span>Cordyceps</span>
-          <span>Magnesium</span>
-          <span>Sodium</span>
-          <span>Potassium</span>
+      <div class="meet-grid">
+        <div class="showcase-product reveal">
+          <img src="assets/hero-bottle-dark.png" alt="Hydro Boost product bottle on reflective surface" loading="lazy" width="1024" height="1024">
+        </div>
+        <div class="meet-copy reveal">
+          <p class="eyebrow">Meet Hydro Boost</p>
+          <h2 id="meet-title">Performance hydration. Zero drag.</h2>
+          <p>Lemon lime gummies packed with electrolytes and adaptogens — built for pre-workout, intra-session, and recovery when bottles and scoops slow you down.</p>
+          <div class="meet-ingredients" data-meet-ingredients role="group" aria-label="Featured formula ingredients">
+            <button type="button" class="meet-ingredient is-active" data-name="Black Maca" data-what="Black maca is a hardy root vegetable grown in the high-altitude plateaus of the Peruvian Andes. Indigenous communities have cultivated and eaten it for centuries as a natural source of energy and stamina." data-info="Supports stamina and endurance for high-output training blocks." data-dose="500 mg">
+              <span class="meet-ingredient-thumb"><img src="assets/ingredients/maca.png" alt="" width="96" height="96" loading="lazy"></span>
+              <span class="meet-ingredient-label">Black Maca</span>
+            </button>
+            <button type="button" class="meet-ingredient" data-name="Cordyceps" data-what="Cordyceps is a rare fungus found in the high mountains of Tibet and China. Traditional healers have used it for centuries as a natural tonic for energy and physical resilience." data-info="Functional mushroom linked to energy and endurance support." data-dose="200 mg">
+              <span class="meet-ingredient-thumb"><img src="assets/ingredients/cordyceps.jpg" alt="" width="96" height="96" loading="lazy"></span>
+              <span class="meet-ingredient-label">Cordyceps</span>
+            </button>
+            <button type="button" class="meet-ingredient" data-name="Magnesium" data-what="Magnesium is an essential mineral your body cannot make on its own — it comes from foods like nuts, seeds, leafy greens, and whole grains. It is involved in hundreds of processes, from muscle contractions to nerve signaling." data-info="Essential mineral for muscle function and nerve signaling." data-dose="80 mg">
+              <span class="meet-ingredient-thumb"><img src="assets/ingredients/magnesium.jpg" alt="" width="96" height="96" loading="lazy"></span>
+              <span class="meet-ingredient-label">Magnesium</span>
+            </button>
+            <button type="button" class="meet-ingredient" data-name="Sodium" data-what="Sodium is one of the body's primary electrolytes, most commonly obtained from salt in food and fluids. Your cells rely on it to regulate fluid balance — especially when you sweat during activity." data-info="Key electrolyte for fluid balance during intense effort." data-dose="150 mg">
+              <span class="meet-ingredient-thumb"><img src="assets/ingredients/sodium.jpg" alt="" width="96" height="96" loading="lazy"></span>
+              <span class="meet-ingredient-label">Sodium</span>
+            </button>
+            <button type="button" class="meet-ingredient" data-name="Potassium" data-what="Potassium is an essential mineral and electrolyte found naturally in bananas, potatoes, avocados, and leafy greens. It works alongside sodium to help maintain fluid balance inside and outside your cells." data-info="Works with sodium to support hydration at the cellular level." data-dose="100 mg">
+              <span class="meet-ingredient-thumb"><img src="assets/ingredients/potassium.jpg" alt="" width="96" height="96" loading="lazy"></span>
+              <span class="meet-ingredient-label">Potassium</span>
+            </button>
+          </div>
+          <div class="meet-ingredient-panel" aria-live="polite">
+            <p class="meet-ingredient-eyebrow">Inside every gummy</p>
+            <p class="meet-ingredient-title" data-meet-ingredient-name>Black Maca</p>
+            <p class="meet-ingredient-about" data-meet-ingredient-about>Black maca is a hardy root vegetable grown in the high-altitude plateaus of the Peruvian Andes. Indigenous communities have cultivated and eaten it for centuries as a natural source of energy and stamina.</p>
+            <p class="meet-ingredient-detail" data-meet-ingredient-detail>Supports stamina and endurance for high-output training blocks.</p>
+            <p class="meet-ingredient-dose" data-meet-ingredient-dose>500 mg per serving</p>
+          </div>
+          <a class="cta-link cta-link--compact" href="#inside">Full formula breakdown <span aria-hidden="true">→</span></a>
         </div>
       </div>
     </section>
@@ -220,7 +265,20 @@
         <div class="compare-row" role="row"><span>Electrolytes + adaptogens</span><span class="win">✓</span><span class="lose">✗</span><span class="partial">~</span></div>
         <div class="compare-row" role="row"><span>Pocket portable</span><span class="win">✓</span><span class="lose">✗</span><span class="partial">~</span></div>
       </div>
+      <p class="section-foot reveal">
+        <a class="cta-link" href="#product">See Hydro Boost specs <span aria-hidden="true">→</span></a>
+      </p>
     </section>
+
+    <aside class="conversion-band section slice" aria-label="Shop Hydro Boost">
+      <div class="conversion-band-inner reveal">
+        <div class="conversion-band-copy">
+          <p class="eyebrow">No shaker required</p>
+          <p class="conversion-band-title">Grab a jar. Chew. Go.</p>
+        </div>
+        <a class="button primary magnetic" href="https://www.buyhydroboost.com/product-page/hydro-boost">Fuel Up</a>
+      </div>
+    </aside>
 
     <section class="section works slice-alt" aria-labelledby="works-title">
       <div class="section-head reveal">
@@ -234,6 +292,9 @@
         <article><b>03</b><small class="phase">REPLENISH</small><h3>Refuel Fast</h3><p>Sodium, potassium, and magnesium support fluid balance.</p></article>
         <article><b>04</b><small class="phase">RECOVER</small><h3>Bounce Back</h3><p>Clean, portable recovery — ready for the next session.</p></article>
       </div>
+      <p class="section-foot reveal">
+        <a class="cta-chip" href="https://www.buyhydroboost.com/product-page/hydro-boost">Build your stack</a>
+      </p>
     </section>
 
     <section class="section benefits slice" aria-labelledby="benefits-title">
@@ -249,6 +310,9 @@
         <article class="benefit reveal"><span>05</span><h3>Tastes Clean</h3><p>Bright lemon lime — no chalky aftertaste.</p></article>
         <article class="benefit reveal"><span>06</span><h3>Daily Fuel</h3><p>A simple habit for athletes and active pros.</p></article>
       </div>
+      <p class="section-foot reveal">
+        <a class="cta-link" href="#inside">What's inside each gummy <span aria-hidden="true">→</span></a>
+      </p>
     </section>
 
     <section class="section inside slice-alt" id="inside" aria-labelledby="inside-title">
@@ -282,6 +346,10 @@
         <p class="ingredient-about" data-ingredient-about>Black maca is a hardy root vegetable grown in the high-altitude plateaus of the Peruvian Andes. Indigenous communities have cultivated and eaten it for centuries as a natural source of energy and stamina.</p>
         <p class="ingredient-detail" data-ingredient-detail>Supports stamina and endurance for high-output training blocks.</p>
         <p class="ingredient-dose" data-ingredient-dose>500 mg per serving</p>
+      </div>
+      <div class="cta-split reveal">
+        <a class="button secondary magnetic" href="#calculator">Calculate your target</a>
+        <a class="cta-chip" href="https://www.buyhydroboost.com/product-page/hydro-boost">Add to bag</a>
       </div>
     </section>
 
@@ -324,6 +392,9 @@
           </div>
         </figure>
       </div>
+      <p class="section-foot reveal">
+        <a class="cta-link" href="#product">Pack it for your next session <span aria-hidden="true">→</span></a>
+      </p>
     </section>
 
     <section class="section science slice-alt" aria-labelledby="science-title">
@@ -331,6 +402,7 @@
         <p class="eyebrow">Electrolyte science</p>
         <h2 id="science-title">Minerals that move with you.</h2>
         <p>When you sweat, you lose more than water. Hydro Boost delivers sodium, potassium, and magnesium in a portable format designed for active recovery.</p>
+        <a class="cta-link" href="#inside">View full formula <span aria-hidden="true">→</span></a>
       </div>
       <div class="electrolyte-bars reveal" aria-label="Electrolyte breakdown per serving">
         <div class="bar-row"><span class="bar-label">Sodium</span><div class="bar-track"><div class="bar-fill" style="--w: 85"></div></div><span class="bar-value">150 mg</span></div>
@@ -357,6 +429,9 @@
         </article>
         <button class="carousel-btn" type="button" data-next aria-label="Next review">›</button>
       </div>
+      <p class="section-foot reveal">
+        <a class="cta-chip" href="https://www.buyhydroboost.com/product-page/hydro-boost">Join the lineup</a>
+      </p>
     </section>
 
     <section class="section split slice-alt" aria-labelledby="split-title">
@@ -379,6 +454,10 @@
           <p><span class="split-icon split-icon--win" aria-hidden="true"><i class="fa-solid fa-check"></i></span>Faster bounce-back</p>
           <p><span class="split-icon split-icon--win" aria-hidden="true"><i class="fa-solid fa-check"></i></span>Pocket-ready fuel</p>
         </article>
+      </div>
+      <div class="cta-split reveal">
+        <a class="button primary magnetic" href="https://www.buyhydroboost.com/product-page/hydro-boost">Make the switch</a>
+        <a class="cta-link" href="#comparison">Compare formats <span aria-hidden="true">→</span></a>
       </div>
     </section>
 
@@ -404,6 +483,7 @@
           </div>
         </div>
         <p class="calc-note">Estimate only — not medical advice. Drink to thirst, measure sweat rate when possible, and follow the product label. Sources: NASEM DRI (2005), ACSM fluid replacement (2007), NATA position statement (2017).</p>
+        <a class="cta-link" href="#product">Shop your hydration target <span aria-hidden="true">→</span></a>
       </form>
     </section>
 
@@ -444,6 +524,10 @@
         <details><summary>Is it gym bag ready?</summary><p>Yes. Pocket-sized, no mixing, no spills, no shaker required.</p></details>
         <details><summary>What is your return and refund policy?</summary><p>Customer satisfaction is important to us. Unopened and unused products may be returned within 14 days of delivery, provided they remain in their original packaging and in resalable condition. Once the returned item is received and inspected, eligible refunds will be processed to the original payment method. Please note that opened or used products cannot be returned for health and safety reasons.</p></details>
         <details><summary>How is my personal information protected?</summary><p>Your privacy is a priority. Personal information is collected only to process orders, provide customer support, improve your shopping experience, and communicate important updates regarding your purchase. Hydro Boost uses appropriate security measures to safeguard your information and does not sell your personal data to third parties. Customers may also request access to, correction of, or deletion of their personal information in accordance with applicable privacy laws.</p></details>
+      </div>
+      <div class="cta-split reveal">
+        <a class="cta-link" href="https://www.buyhydroboost.com/contact">Contact support <span aria-hidden="true">→</span></a>
+        <a class="cta-chip" href="https://www.buyhydroboost.com/product-page/hydro-boost">Shop Hydro Boost</a>
       </div>
     </section>
 

@@ -1,6 +1,5 @@
 const revealItems = document.querySelectorAll(".reveal");
 const counters = document.querySelectorAll("[data-count]");
-const tiltTarget = document.querySelector("[data-tilt]");
 const heroInteractive = document.querySelector("[data-hero-interactive]");
 const calc = document.querySelector("[data-calc]");
 const gaugeRing = document.querySelector("[data-gauge-ring]");
@@ -85,17 +84,6 @@ const counterObserver = new IntersectionObserver((entries) => {
 });
 counters.forEach((counter) => counterObserver.observe(counter));
 
-if (tiltTarget) {
-  window.addEventListener("mousemove", (event) => {
-    const x = (event.clientX / window.innerWidth - 0.5) * 2;
-    const y = (event.clientY / window.innerHeight - 0.5) * 2;
-    tiltTarget.style.transform = `perspective(1100px) rotateY(${x * 8}deg) rotateX(${-y * 6}deg)`;
-  }, { passive: true });
-  window.addEventListener("mouseleave", () => {
-    tiltTarget.style.transform = "";
-  });
-}
-
 if (heroInteractive) {
   const heroIngredients = heroInteractive.querySelectorAll(".hero-ingredient");
   const formulaName = heroInteractive.querySelector("[data-hero-formula-name]");
@@ -159,6 +147,35 @@ if (heroInteractive) {
     heroInteractive.classList.remove("is-exploring");
     heroIngredients.forEach((item) => item.classList.remove("is-focused"));
     resetFormulaPanel();
+  });
+}
+
+const meetInteractive = document.querySelector("[data-meet-ingredients]");
+
+if (meetInteractive) {
+  const meetIngredients = meetInteractive.querySelectorAll(".meet-ingredient");
+  const meetPanel = meetInteractive.closest(".meet-copy")?.querySelector(".meet-ingredient-panel");
+  const meetName = meetPanel?.querySelector("[data-meet-ingredient-name]");
+  const meetAbout = meetPanel?.querySelector("[data-meet-ingredient-about]");
+  const meetDetail = meetPanel?.querySelector("[data-meet-ingredient-detail]");
+  const meetDose = meetPanel?.querySelector("[data-meet-ingredient-dose]");
+
+  function setMeetPanel(button) {
+    if (!meetPanel || !button) return;
+    meetIngredients.forEach((item) => item.classList.toggle("is-active", item === button));
+    if (meetName) meetName.textContent = button.dataset.name || "";
+    if (meetAbout) meetAbout.textContent = button.dataset.what || "";
+    if (meetDetail) meetDetail.textContent = button.dataset.info || "";
+    if (meetDose) meetDose.textContent = `${button.dataset.dose || ""} per serving`;
+    meetPanel.classList.remove("is-updating");
+    void meetPanel.offsetWidth;
+    meetPanel.classList.add("is-updating");
+  }
+
+  meetIngredients.forEach((button) => {
+    button.addEventListener("mouseenter", () => setMeetPanel(button));
+    button.addEventListener("focus", () => setMeetPanel(button));
+    button.addEventListener("click", () => setMeetPanel(button));
   });
 }
 
@@ -314,6 +331,22 @@ document.querySelectorAll(".electrolyte-bars").forEach((el) => barObserver.obser
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+document.querySelectorAll("[data-motion-player]").forEach((player) => {
+  const video = player.querySelector(".in-motion-video");
+  if (!video || reduceMotion) return;
+
+  const motionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: 0.35 });
+  motionObserver.observe(video);
+});
+
 document.querySelectorAll(".gallery-card--hover-video").forEach((card) => {
   const video = card.querySelector(".gallery-video");
   if (!video || reduceMotion) return;
@@ -373,4 +406,14 @@ if (footerForm) {
     status.textContent = "Thanks — you're on the list.";
     footerForm.reset();
   });
+}
+
+const stickyBuy = document.querySelector(".sticky-buy");
+const heroSection = document.querySelector(".hero");
+
+if (stickyBuy && heroSection) {
+  const stickyObserver = new IntersectionObserver(([entry]) => {
+    stickyBuy.classList.toggle("is-visible", !entry.isIntersecting);
+  }, { threshold: 0.12 });
+  stickyObserver.observe(heroSection);
 }
