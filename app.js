@@ -398,6 +398,21 @@ document.querySelectorAll(".electrolyte-bars").forEach((el) => barObserver.obser
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+const sectionVideos = document.querySelectorAll("[data-section-video]");
+if (sectionVideos.length && !reduceMotion) {
+  const sectionVideoObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target;
+      if (entry.isIntersecting) {
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: 0.2 });
+  sectionVideos.forEach((video) => sectionVideoObserver.observe(video));
+}
+
 document.querySelectorAll(".gallery-card--hover-video").forEach((card) => {
   const video = card.querySelector(".gallery-video");
   if (!video || reduceMotion) return;

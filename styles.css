@@ -144,6 +144,54 @@ button, input, select { font: inherit; }
 .slice::before { background: var(--bg); }
 .slice-alt::before { background: linear-gradient(180deg, rgba(232, 255, 58, .04), var(--bg)); }
 
+.section.has-section-bg {
+  isolation: isolate;
+  background: var(--bg);
+}
+.section.has-section-bg.slice-alt {
+  background: var(--bg);
+}
+.section.has-section-bg.slice::before,
+.section.has-section-bg.slice-alt::before {
+  background: var(--bg);
+}
+.section-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.section-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: .55;
+  filter: saturate(1.08) contrast(1.05) brightness(.88);
+}
+.section-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10, 10, 10, .78) 0%, rgba(10, 10, 10, .68) 45%, rgba(10, 10, 10, .88) 100%),
+    linear-gradient(90deg, rgba(10, 10, 10, .5) 0%, transparent 55%, rgba(10, 10, 10, .35) 100%);
+}
+.section.has-section-bg > *:not(.section-bg) {
+  position: relative;
+  z-index: 1;
+}
+.section.has-section-bg .section-head h2,
+.section.has-section-bg .science-copy h2,
+.section.has-section-bg .calc-copy h2 {
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .55);
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-bg-video { display: none; }
+}
+
 .hero {
   position: relative;
   isolation: isolate;
@@ -1633,63 +1681,6 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   display: block;
 }
 .gallery-card.wide { min-height: 420px; }
-
-/* Fit In Action in one viewport; scale gallery as a proportional unit */
-.lifestyle {
-  --lifestyle-chrome: 148px;
-  min-height: 100svh;
-  height: 100svh;
-  max-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  padding-top: clamp(28px, 4svh, 56px);
-  padding-bottom: clamp(28px, 4svh, 56px);
-  overflow: hidden;
-}
-
-.lifestyle .section-head {
-  flex: 0 0 auto;
-  width: min(720px, 100%);
-  margin-bottom: clamp(10px, 1.6svh, 20px);
-  align-self: center;
-}
-
-.lifestyle h2 {
-  font-size: clamp(1.55rem, 2.6vw, 2.45rem);
-  margin-bottom: 6px;
-  max-width: none;
-}
-
-.lifestyle .gallery {
-  --gallery-max-h: calc(100svh - var(--lifestyle-chrome));
-  flex: 0 1 auto;
-  min-height: 0;
-  width: min(100%, calc(var(--gallery-max-h) * 1180 / 856));
-  max-width: 100%;
-  aspect-ratio: 1180 / 856;
-  height: auto;
-  max-height: var(--gallery-max-h);
-  margin-inline: auto;
-  grid-template-columns: 1.2fr .8fr;
-  grid-template-rows: 1fr 1fr;
-  gap: clamp(10px, 1.4%, 16px);
-  align-content: stretch;
-}
-
-.lifestyle .gallery-card,
-.lifestyle .gallery-card.wide {
-  min-height: 0;
-  height: auto;
-  align-self: stretch;
-}
-
-.lifestyle .section-foot {
-  flex: 0 0 auto;
-  margin-top: clamp(12px, 1.8svh, 24px);
-}
 .gallery-card img,
 .gallery-card video {
   position: absolute;
@@ -2401,33 +2392,6 @@ select {
   .compare-row { grid-template-columns: 1fr 1fr; }
   .compare-row > :first-child { grid-column: 1 / -1; background: rgba(255,255,255,.03); font-weight: 800; }
   .gallery, .split-grid, .pricing-grid { grid-template-columns: 1fr; }
-  .lifestyle {
-    --lifestyle-chrome: auto;
-    height: auto;
-    max-height: none;
-    min-height: 0;
-    overflow: visible;
-    padding-top: clamp(56px, 8svh, 72px);
-    padding-bottom: clamp(56px, 8svh, 72px);
-  }
-  .lifestyle h2 {
-    font-size: clamp(1.7rem, 5vw, 2.4rem);
-    max-width: none;
-  }
-  .lifestyle .gallery {
-    width: 100%;
-    height: auto;
-    max-height: none;
-    aspect-ratio: auto;
-    grid-template-rows: none;
-    gap: 16px;
-  }
-  .lifestyle .gallery-card,
-  .lifestyle .gallery-card.wide {
-    min-height: 280px;
-    height: auto;
-  }
-  .lifestyle .section-foot { margin-top: 28px; }
   .buy-panel { position: static; }
   .product-images {
     align-self: center;
@@ -2463,9 +2427,7 @@ select {
   .hero-stats { grid-template-columns: repeat(3, 1fr); max-width: 100%; }
   .situation-grid, .benefit-grid, .ingredient-grid, .timeline { grid-template-columns: 1fr; }
   .situation, .benefit, .price { min-height: 0; }
-  .gallery figure, .gallery .wide, .gallery-card, .gallery-card.wide,
-  .lifestyle .gallery-card,
-  .lifestyle .gallery-card.wide { min-height: 260px; }
+  .gallery figure, .gallery .wide, .gallery-card, .gallery-card.wide { min-height: 260px; }
   .review-shell { grid-template-columns: 40px 1fr 40px; padding: 16px; }
   .carousel-btn { width: 40px; height: 40px; font-size: 1.4rem; }
   .sticky-buy { left: 12px; right: 12px; bottom: 12px; justify-content: center; }
