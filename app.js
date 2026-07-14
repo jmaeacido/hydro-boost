@@ -88,6 +88,7 @@ if (heroInteractive) {
   const heroIngredients = heroInteractive.querySelectorAll(".hero-ingredient");
   const formulaName = heroInteractive.querySelector("[data-hero-formula-name]");
   const formulaCopy = heroInteractive.querySelector("[data-hero-formula-copy]");
+  const formulaStudy = heroInteractive.querySelector("[data-hero-formula-study]");
   const touchMode = window.matchMedia("(hover: none)");
   const defaultName = formulaName?.textContent || "";
   const defaultCopy = formulaCopy?.textContent || "";
@@ -96,6 +97,11 @@ if (heroInteractive) {
     if (!formulaName || !formulaCopy || !button) return;
     formulaName.textContent = button.dataset.name || defaultName;
     formulaCopy.textContent = button.dataset.desc || defaultCopy;
+    if (formulaStudy) {
+      const study = button.dataset.study || "";
+      formulaStudy.textContent = study ? `Study: ${study}` : "";
+      formulaStudy.hidden = !study;
+    }
     heroInteractive.classList.add("has-selection");
   }
 
@@ -103,6 +109,10 @@ if (heroInteractive) {
     if (!formulaName || !formulaCopy) return;
     formulaName.textContent = defaultName;
     formulaCopy.textContent = defaultCopy;
+    if (formulaStudy) {
+      formulaStudy.textContent = "";
+      formulaStudy.hidden = true;
+    }
     heroInteractive.classList.remove("has-selection");
   }
 
@@ -330,22 +340,6 @@ const barObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll(".electrolyte-bars").forEach((el) => barObserver.observe(el));
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-document.querySelectorAll("[data-motion-player]").forEach((player) => {
-  const video = player.querySelector(".in-motion-video");
-  if (!video || reduceMotion) return;
-
-  const motionObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
-    });
-  }, { threshold: 0.35 });
-  motionObserver.observe(video);
-});
 
 document.querySelectorAll(".gallery-card--hover-video").forEach((card) => {
   const video = card.querySelector(".gallery-video");

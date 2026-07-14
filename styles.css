@@ -147,8 +147,7 @@ button, input, select { font: inherit; }
   isolation: isolate;
   min-height: 100svh;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);
-  grid-template-areas: "copy product";
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 32px;
   padding-top: 72px;
@@ -168,9 +167,9 @@ button, input, select { font: inherit; }
   height: 100%;
   object-fit: cover;
   object-position: 70% center;
-  opacity: .52;
-  filter: saturate(1.18) contrast(1.12) brightness(1.06);
-  transform: scale(1.04);
+  opacity: .92;
+  filter: saturate(1.14) contrast(1.08) brightness(1.08);
+  transform: scale(1.02);
   animation: heroBgDrift 14s ease-in-out infinite alternate;
 }
 .hero-bg-img {
@@ -180,16 +179,16 @@ button, input, select { font: inherit; }
   height: 100%;
   object-fit: cover;
   object-position: 70% center;
-  opacity: .28;
+  opacity: .55;
 }
 .hero-bg-img--fallback { display: none; }
 .hero-bg-overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(10, 10, 10, .92) 0%, rgba(10, 10, 10, .78) 40%, rgba(10, 10, 10, .42) 64%, rgba(10, 10, 10, .74) 100%),
-    radial-gradient(1200px 520px at 65% 35%, rgba(232, 255, 58, .06), transparent 58%),
-    linear-gradient(0deg, var(--bg) 0%, transparent 34%);
+    linear-gradient(90deg, rgba(10, 10, 10, .78) 0%, rgba(10, 10, 10, .42) 36%, rgba(10, 10, 10, .12) 62%, rgba(10, 10, 10, .28) 100%),
+    radial-gradient(1100px 520px at 72% 40%, rgba(232, 255, 58, .05), transparent 60%),
+    linear-gradient(0deg, var(--bg) 0%, transparent 28%);
 }
 .hero-slash {
   position: absolute;
@@ -203,7 +202,6 @@ button, input, select { font: inherit; }
 }
 
 .hero-copy {
-  grid-area: copy;
   position: relative;
   z-index: 2;
   max-width: 560px;
@@ -260,11 +258,10 @@ button, input, select { font: inherit; }
 }
 
 .hero-product {
-  grid-area: product;
   position: relative;
   z-index: 2;
-  justify-self: end;
-  width: clamp(320px, 52vw, 640px);
+  justify-self: center;
+  width: min(100%, clamp(320px, 48vw, 580px));
   overflow: visible;
 }
 
@@ -538,8 +535,8 @@ button, input, select { font: inherit; }
 
 .hero-formula-panel {
   margin-top: 14px;
-  padding: 16px 18px;
-  min-height: 108px;
+  padding: 16px 18px 18px;
+  min-height: 148px;
   text-align: center;
   border: 1px solid rgba(232, 255, 58, .14);
   background: linear-gradient(180deg, rgba(232, 255, 58, .06), rgba(8, 8, 8, .92));
@@ -581,6 +578,24 @@ button, input, select { font: inherit; }
   transition: opacity .2s ease, transform .2s ease;
 }
 
+.hero-formula-study {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(232, 255, 58, .14);
+  font-family: var(--label-sans);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  line-height: 1.45;
+  text-transform: uppercase;
+  color: rgba(232, 255, 58, .78);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.hero-formula-study[hidden] {
+  display: none;
+}
+
 .hero-product:hover .hero-formula-panel,
 .hero-product.is-exploring .hero-formula-panel,
 .hero-product:focus-within .hero-formula-panel,
@@ -592,7 +607,8 @@ button, input, select { font: inherit; }
 }
 
 .hero-product.has-selection .hero-formula-name,
-.hero-product.has-selection .hero-formula-copy {
+.hero-product.has-selection .hero-formula-copy,
+.hero-product.has-selection .hero-formula-study {
   animation: heroPanelSwap .32s ease;
 }
 
@@ -901,24 +917,8 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   line-height: 1.6;
 }
 
-.in-motion-player {
-  position: relative;
-  width: 100%;
-  height: min(72vh, calc(100svh - 160px));
-  overflow: hidden;
-  border: 1px solid rgba(232, 255, 58, .22);
-  background: #000;
-  box-shadow: 0 28px 80px rgba(0, 0, 0, .62);
-  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
-}
-
-.in-motion-video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 70% center;
-  filter: saturate(1.12) contrast(1.08) brightness(1.02);
+.in-motion .hero-product {
+  max-width: 580px;
 }
 
 .scroll-cue span {
@@ -2200,7 +2200,7 @@ select {
 @keyframes stripeMove { 50% { transform: skewX(-24deg) translateX(8vw); opacity: .55; } }
 @keyframes lineFlash { 50% { opacity: .7; transform: rotate(18deg) scaleY(1.1); } }
 @keyframes gradientMove { to { background-position: 200% 0; } }
-@keyframes heroBgDrift { 50% { transform: scale(1.09) translateY(-1.2%); filter: saturate(1.1) contrast(1.06); } }
+@keyframes heroBgDrift { 50% { transform: scale(1.05) translateY(-1%); filter: saturate(1.1) contrast(1.05) brightness(1.1); } }
 @keyframes ctaPulse { 50% { box-shadow: 0 8px 40px rgba(232, 255, 58, .45); } }
 @keyframes scrollDot { 80% { opacity: 0; transform: translate(-50%, 16px); } 100% { opacity: 0; } }
 @keyframes iconPulse { 50% { transform: scale(1.08); } }
@@ -2253,14 +2253,10 @@ select {
     min-height: auto;
   }
   .hero-copy {
-    grid-area: auto;
     max-width: none;
-    order: 1;
   }
   .hero-product {
-    grid-area: auto;
     justify-self: center;
-    order: 2;
     width: min(92vw, 480px);
   }
   .showcase-product {
@@ -2275,9 +2271,6 @@ select {
   .in-motion-copy {
     text-align: center;
     margin-inline: auto;
-  }
-  .in-motion-player {
-    height: min(52vh, calc(100svh - 280px));
   }
   h1 { max-width: none; margin-inline: auto; }
   h1 em { display: block; }
@@ -2333,7 +2326,7 @@ select {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
   .hero-bg-video { display: none; }
-  .hero-bg-img--fallback { display: block; opacity: .28; }
+  .hero-bg-img--fallback { display: block; opacity: .55; }
   .hero-ingredients,
   .hero-ingredient,
   .hero-product-aura,
@@ -2350,8 +2343,5 @@ select {
   }
   .hero-product-visual {
     animation: none;
-  }
-  .in-motion-video {
-    filter: none;
   }
 }
