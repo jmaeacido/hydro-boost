@@ -61,6 +61,9 @@ body::before {
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 button, input, select { font: inherit; }
+button, .button, .cta-chip, .sticky-buy, .hero-ingredient, .meet-ingredient, .ingredient, .carousel-btn {
+  touch-action: manipulation;
+}
 
 .ambient { display: none; }
 .hero-slash { display: none; }
@@ -121,7 +124,7 @@ button, input, select { font: inherit; }
 
 .section {
   position: relative;
-  width: min(100%, 100vw);
+  width: 100%;
   padding:
     clamp(56px, 8svh, 100px)
     max(24px, calc((100vw - var(--max)) / 2));
@@ -1492,7 +1495,7 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 }
 .perf-tags span:nth-child(2) { border-color: rgba(255, 77, 0, .4); color: var(--orange); background: rgba(255, 77, 0, .08); }
 
-.compare-table { overflow: hidden; }
+.compare-table { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
 .compare-row {
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr 1fr;
@@ -2058,8 +2061,8 @@ select {
 
 .sticky-buy {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
   z-index: 15;
   display: inline-flex;
   min-height: 56px;
@@ -2088,8 +2091,16 @@ select {
   pointer-events: auto;
 }
 
+.sticky-buy.is-hidden-footer {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  pointer-events: none;
+}
+
 .sticky-buy:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(232, 255, 58, .35); }
 .sticky-buy.is-visible:hover { transform: translateY(-2px); }
+.sticky-buy.is-visible.is-hidden-footer:hover { transform: translateY(16px); }
 
 .site-footer {
   position: relative;
@@ -2311,11 +2322,16 @@ select {
   }
   .meet-copy {
     text-align: center;
+    max-height: none;
+    overflow: visible;
   }
   .meet-ingredients {
     justify-content: center;
     flex-wrap: wrap;
     overflow-x: visible;
+  }
+  .meet-ingredient {
+    width: clamp(64px, 14vw, 88px);
   }
   .meet .showcase-product {
     width: min(78vw, 360px);
@@ -2326,21 +2342,36 @@ select {
     width: 100%;
     height: 100%;
   }
+  .conversion-band {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
   .conversion-band-inner {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
+    padding: 24px 20px;
   }
   .conversion-band .button {
     width: 100%;
   }
   .hero {
     text-align: center;
-    padding-top: 48px;
+    padding-top: max(48px, env(safe-area-inset-top, 0px));
     gap: 28px;
-    min-height: 0;
+    min-height: 100svh;
     height: auto;
     max-height: none;
+    align-content: center;
+  }
+  .hero-bg-video,
+  .hero-bg-img {
+    object-position: center 32%;
+  }
+  .hero-bg-overlay {
+    background:
+      linear-gradient(180deg, rgba(10, 10, 10, .58) 0%, rgba(10, 10, 10, .72) 42%, rgba(10, 10, 10, .92) 100%),
+      radial-gradient(720px 420px at 50% 28%, rgba(232, 255, 58, .05), transparent 62%);
   }
   .hero-copy {
     max-width: none;
@@ -2358,18 +2389,19 @@ select {
     height: auto;
     max-height: none;
     min-height: 0;
+    overflow: visible;
     padding-top: clamp(56px, 8svh, 72px);
     padding-bottom: clamp(56px, 8svh, 72px);
   }
   .in-motion-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
     max-height: none;
   }
   .in-motion .hero-product {
-    width: min(92vw, 440px);
+    width: min(88vw, 420px);
     max-height: none;
-    margin-inline: auto;
+    margin: 36px auto 0;
   }
   .in-motion .hero-formula-panel {
     text-align: center;
@@ -2381,16 +2413,32 @@ select {
     margin-inline: auto;
     font-size: clamp(1.2rem, 6.5cqi, 1.85rem);
   }
+  .hero-ingredient--magnesium { top: -10%; left: 36%; width: clamp(80px, 20%, 112px); }
+  .hero-ingredient--cordyceps { top: 14%; left: 2%; }
+  .hero-ingredient--sodium { top: 14%; right: 2%; }
+  .hero-ingredient--maca { top: 48%; left: 0; }
+  .hero-ingredient--potassium { top: 52%; right: 0; }
   h1 { max-width: none; margin-inline: auto; }
   h1 em { display: block; }
   .hero-sub, .section-head, .science-copy, .calc-copy { margin-inline: auto; }
   .cta-row, .hero-badges, .hero-stats { justify-content: center; margin-inline: auto; }
+  .cta-row { width: min(100%, 420px); }
+  .cta-row .button { flex: 1 1 auto; min-width: min(100%, 180px); }
   .hero-stats { max-width: 100%; grid-template-columns: repeat(3, 1fr); }
   .situation-grid, .benefit-grid { grid-template-columns: repeat(2, 1fr); }
   .ingredient-grid { grid-template-columns: repeat(2, 1fr); }
   .timeline { grid-template-columns: 1fr 1fr; }
-  .compare-row { grid-template-columns: 1fr 1fr; }
-  .compare-row > :first-child { grid-column: 1 / -1; background: rgba(255,255,255,.03); font-weight: 800; }
+  .compare-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .compare-row {
+    grid-template-columns: minmax(120px, 1.2fr) repeat(3, minmax(92px, 1fr));
+    min-width: 520px;
+  }
+  .compare-row > * { padding: 14px 12px; font-size: .9rem; }
+  .compare-head > * { font-size: .64rem; letter-spacing: .1em; }
   .gallery, .split-grid, .pricing-grid { grid-template-columns: 1fr; }
   .buy-panel { position: static; }
   .product-images {
@@ -2403,9 +2451,18 @@ select {
   .bar-row { grid-template-columns: 80px 1fr 60px; }
   .final-cta {
     min-height: 0;
+    text-align: center;
   }
   .final-product {
     width: min(72vw, 480px);
+  }
+  .cta-split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cta-split .button,
+  .cta-split .cta-chip {
+    width: 100%;
   }
   .footer-grid {
     grid-template-columns: 1fr 1fr;
@@ -2415,27 +2472,202 @@ select {
 }
 
 @media (max-width: 640px) {
-  .section { padding: 56px 16px; }
-  .hero { min-height: 0; height: auto; max-height: none; padding-bottom: 64px; gap: 16px; }
-  h1 { font-size: clamp(2.8rem, 12vw, 4rem); }
-  h2 { font-size: clamp(1.7rem, 7.5vw, 2.4rem); }
+  .section { padding: 48px 16px; }
+  .hero {
+    min-height: 100svh;
+    height: auto;
+    max-height: none;
+    padding-inline: 16px;
+    padding-bottom: max(72px, calc(48px + env(safe-area-inset-bottom, 0px)));
+    gap: 18px;
+  }
+  .hero .eyebrow {
+    letter-spacing: .18em;
+    font-size: .68rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.35rem, 11vw, 3.4rem);
+    margin-bottom: 14px;
+    letter-spacing: .06em;
+  }
+  .hero-sub {
+    font-size: 1rem;
+    margin-inline: auto;
+  }
+  .hero .button {
+    min-height: 54px;
+    padding: 0 24px;
+    font-size: .95rem;
+  }
+  .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    margin: 20px 0;
+    gap: 10px;
+  }
+  .cta-row .button {
+    width: 100%;
+    min-width: 0;
+  }
+  h1 { font-size: clamp(2.35rem, 11vw, 3.4rem); }
+  h2 { font-size: clamp(1.55rem, 7vw, 2.2rem); }
   .hero-product { width: min(94vw, 400px); }
-  .hero-product-visual { width: 96%; height: 96%; }
-  .hero-formula-panel { min-height: 96px; padding: 14px; }
-  .hero-ingredient-hint { display: none; }
+  .hero-product-visual { width: 92%; height: 92%; }
+  .hero-formula-panel {
+    min-height: 0;
+    padding: 14px 14px 16px;
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  }
+  .hero-formula-name { font-size: 1.1rem; }
+  .hero-formula-copy { font-size: .88rem; }
+  .hero-formula-study { font-size: .62rem; }
+  .in-motion .hero-product {
+    width: min(92vw, 360px);
+    margin-top: 28px;
+  }
+  .hero-ingredients { inset: 4% -4% 0; }
+  .hero-ingredient {
+    width: clamp(62px, 17vw, 84px);
+    gap: 5px;
+  }
+  .hero-ingredient-name {
+    font-size: .52rem;
+    letter-spacing: .08em;
+    padding: 3px 6px;
+  }
+  .hero-ingredient--magnesium { top: -6%; left: 34%; width: clamp(70px, 19vw, 92px); }
+  .hero-ingredient--cordyceps { top: 16%; left: 0; }
+  .hero-ingredient--sodium { top: 16%; right: 0; }
+  .hero-ingredient--maca { top: 50%; left: -1%; }
+  .hero-ingredient--potassium { top: 54%; right: -1%; }
+  .hero-ingredient-hint {
+    display: block;
+    margin-top: 14px;
+    font-size: .68rem;
+  }
   .showcase-product { width: min(78vw, 340px); }
-  .hero-stats { grid-template-columns: repeat(3, 1fr); max-width: 100%; }
-  .situation-grid, .benefit-grid, .ingredient-grid, .timeline { grid-template-columns: 1fr; }
+  .hero-badges { gap: 8px; margin-bottom: 14px; }
+  .hero .hero-badges span {
+    font-size: .62rem;
+    letter-spacing: .1em;
+    padding: 5px 10px;
+  }
+  .hero-stats {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 100%;
+    gap: 8px;
+  }
+  .stat-block { padding: 10px 6px; }
+  .stat-block strong { font-size: 1.45rem; }
+  .stat-block span {
+    font-size: .55rem;
+    letter-spacing: .06em;
+    margin-top: 4px;
+  }
+  .situation-grid, .benefit-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ingredient-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .situation, .benefit, .price { min-height: 0; }
-  .gallery figure, .gallery .wide, .gallery-card, .gallery-card.wide { min-height: 260px; }
+  .situation h3 { font-size: 1.05rem; margin-top: 12px; padding-inline: 12px; }
+  .situation p { font-size: .78rem; padding-inline: 12px; padding-bottom: 14px; }
+  .icon-stage { height: 64px; }
+  .icon-stage i { font-size: 1.85rem; }
+  .icon-stage .icon-lottie,
+  .icon-stage .icon-svg-img,
+  .icon-ring {
+    width: 48px;
+    height: 48px;
+  }
+  .icon-run .icon-lottie { clip-path: circle(24px at 50% 50%); }
+  .timeline {
+    grid-template-columns: 1fr;
+    padding-top: 0;
+    padding-left: 8px;
+    gap: 0;
+  }
+  .timeline .flow {
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    width: 3px;
+    height: auto;
+    background: linear-gradient(180deg, var(--orange), var(--lime), var(--aqua));
+    clip-path: none;
+    animation: none;
+  }
+  .timeline article {
+    padding: 14px 0 18px 22px;
+    border-top: 0;
+    border-left: 2px solid rgba(232, 255, 58, .22);
+  }
+  .compare-row {
+    min-width: 480px;
+    grid-template-columns: minmax(108px, 1.15fr) repeat(3, minmax(84px, 1fr));
+  }
+  .compare-row > * { padding: 12px 10px; font-size: .82rem; }
+  .gallery figure, .gallery .wide, .gallery-card, .gallery-card.wide { min-height: 240px; }
+  .gallery-hook { opacity: .9; }
   .review-shell { grid-template-columns: 40px 1fr 40px; padding: 16px; }
   .carousel-btn { width: 40px; height: 40px; font-size: 1.4rem; }
-  .sticky-buy { left: 12px; right: 12px; bottom: 12px; justify-content: center; }
-  .final-cta { min-height: 0; padding-bottom: 80px; }
-  .final-product { width: min(86vw, 400px); }
-  .site-footer { padding: 72px 16px 96px; }
+  .bar-row {
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
+  }
+  .bar-track { grid-column: 1 / -1; order: 3; }
+  .electrolyte-bars { padding: 18px; gap: 14px; }
+  .calc-panel { padding: 18px; gap: 16px; }
+  .calc-result strong { font-size: 2.8rem; }
+  .buy-panel { padding: 20px; }
+  .accordion details { padding: 14px 16px; }
+  .accordion summary { font-size: .9rem; line-height: 1.35; }
+  .sticky-buy {
+    left: max(12px, env(safe-area-inset-left, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    justify-content: center;
+    min-height: 52px;
+    font-size: .88rem;
+  }
+  .final-cta { min-height: 0; padding-bottom: 96px; }
+  .final-product { width: min(78vw, 340px); }
+  .final-cta h2 { font-size: clamp(1.7rem, 8vw, 2.4rem); }
+  .site-footer {
+    padding:
+      64px 16px
+      max(96px, calc(72px + env(safe-area-inset-bottom, 0px)));
+  }
   .footer-grid { grid-template-columns: 1fr; gap: 36px; }
   .footer-brand-copy { max-width: none; }
+  .scroll-cue { display: none; }
+}
+
+@media (max-width: 400px) {
+  .situation-grid,
+  .benefit-grid,
+  .ingredient-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-badges { justify-content: center; }
+  .stat-block strong { font-size: 1.3rem; }
+}
+
+@media (hover: none) {
+  .gallery-card .gallery-hook { opacity: .9; color: #fff; }
+  .gallery-card--hover-video.is-playing video { opacity: 1; }
+  .button:hover,
+  .secondary:hover,
+  .cta-chip:hover,
+  .situation:hover,
+  .benefit:hover {
+    transform: none;
+  }
+  .sticky-buy:hover,
+  .sticky-buy.is-visible:hover {
+    transform: none;
+  }
+  .sticky-buy.is-visible.is-hidden-footer:hover {
+    transform: translateY(16px);
+  }
 }
 
 /* Short laptop / landscape heights: compress dense sections to fit one screen */

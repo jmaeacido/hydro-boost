@@ -153,7 +153,10 @@ if (heroInteractive) {
     formulaPanel.offsetHeight; // force layout with reserved study footer
     tallestPanel = Math.max(tallestPanel, formulaPanel.offsetHeight);
 
-    const viewportCap = Math.round((window.visualViewport?.height || window.innerHeight) * 0.42);
+    const isNarrow = window.matchMedia("(max-width: 980px)").matches;
+    const viewportCap = Math.round(
+      (window.visualViewport?.height || window.innerHeight) * (isNarrow ? 0.78 : 0.42)
+    );
     if (tallestPanel > 0) {
       const locked = Math.min(tallestPanel, Math.max(160, viewportCap));
       formulaPanel.style.height = `${locked}px`;
@@ -215,6 +218,18 @@ if (heroInteractive) {
     heroIngredients.forEach((item) => item.classList.remove("is-focused"));
     resetFormulaPanel();
   });
+
+  if (touchMode.matches) {
+    const exploreObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        heroInteractive.classList.add("is-exploring");
+        exploreObserver.disconnect();
+      },
+      { threshold: 0.4 }
+    );
+    exploreObserver.observe(heroInteractive);
+  }
 }
 
 const meetInteractive = document.querySelector("[data-meet-ingredients]");
@@ -369,17 +384,20 @@ function updateCalc() {
 calc?.addEventListener("input", updateCalc);
 updateCalc();
 
-document.querySelectorAll(".magnetic").forEach((el) => {
-  el.addEventListener("pointermove", (event) => {
-    const rect = el.getBoundingClientRect();
-    const x = event.clientX - rect.left - rect.width / 2;
-    const y = event.clientY - rect.top - rect.height / 2;
-    el.style.transform = `translate(${x * 0.06}px, ${y * 0.1}px) skewX(-1deg)`;
+const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+if (canHover) {
+  document.querySelectorAll(".magnetic").forEach((el) => {
+    el.addEventListener("pointermove", (event) => {
+      const rect = el.getBoundingClientRect();
+      const x = event.clientX - rect.left - rect.width / 2;
+      const y = event.clientY - rect.top - rect.height / 2;
+      el.style.transform = `translate(${x * 0.06}px, ${y * 0.1}px) skewX(-1deg)`;
+    });
+    el.addEventListener("pointerleave", () => {
+      el.style.transform = "";
+    });
   });
-  el.addEventListener("pointerleave", () => {
-    el.style.transform = "";
-  });
-});
+}
 
 const barObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
@@ -413,18 +431,40 @@ if (sectionVideos.length && !reduceMotion) {
   sectionVideos.forEach((video) => sectionVideoObserver.observe(video));
 }
 
+const galleryTouch = window.matchMedia("(hover: none)");
 document.querySelectorAll(".gallery-card--hover-video").forEach((card) => {
   const video = card.querySelector(".gallery-video");
   if (!video || reduceMotion) return;
   const startAt = Number(video.dataset.start || 0);
-  card.addEventListener("mouseenter", () => {
+
+  const playVideo = () => {
     video.currentTime = startAt;
     video.play().catch(() => {});
-  });
-  card.addEventListener("mouseleave", () => {
+    card.classList.add("is-playing");
+  };
+
+  const pauseVideo = () => {
     video.pause();
     video.currentTime = startAt;
-  });
+    card.classList.remove("is-playing");
+  };
+
+  if (galleryTouch.matches) {
+    const galleryObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
+          playVideo();
+        } else {
+          pauseVideo();
+        }
+      },
+      { threshold: [0, 0.55, 0.8] }
+    );
+    galleryObserver.observe(card);
+  } else {
+    card.addEventListener("mouseenter", playVideo);
+    card.addEventListener("mouseleave", pauseVideo);
+  }
 });
 
 const lottieTargets = document.querySelectorAll(".icon-lottie[data-src]");
@@ -482,4 +522,15 @@ if (stickyBuy && heroSection) {
     stickyBuy.classList.toggle("is-visible", !entry.isIntersecting);
   }, { threshold: 0.12 });
   stickyObserver.observe(heroSection);
+
+  const footerEl = document.querySelector(".site-footer");
+  if (footerEl) {
+    const footerStickyObserver = new IntersectionObserver(
+      ([entry]) => {
+        stickyBuy.classList.toggle("is-hidden-footer", entry.isIntersecting);
+      },
+      { threshold: 0.08 }
+    );
+    footerStickyObserver.observe(footerEl);
+  }
 }
