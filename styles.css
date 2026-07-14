@@ -329,7 +329,7 @@ button, input, select { font: inherit; }
 }
 
 .hero-product:hover .hero-product-visual,
-.hero-product.is-exploring .hero-product-visual,
+.in-motion-grid.is-exploring .hero-product-visual,
 .hero-product:focus-within .hero-product-visual {
   animation: none;
   transform: translate(-50%, -50%);
@@ -419,7 +419,7 @@ button, input, select { font: inherit; }
 }
 
 .hero-product:hover .hero-product-aura,
-.hero-product.is-exploring .hero-product-aura,
+.in-motion-grid.is-exploring .hero-product-aura,
 .hero-product:focus-within .hero-product-aura {
   opacity: 1;
   transform: scale(1);
@@ -427,7 +427,7 @@ button, input, select { font: inherit; }
 }
 
 .hero-product:hover .hero-orbit-ring,
-.hero-product.is-exploring .hero-orbit-ring,
+.in-motion-grid.is-exploring .hero-orbit-ring,
 .hero-product:focus-within .hero-orbit-ring {
   opacity: 1;
   transform: scale(1) rotate(0deg);
@@ -435,31 +435,31 @@ button, input, select { font: inherit; }
 }
 
 .hero-product:hover .hero-formula-links,
-.hero-product.is-exploring .hero-formula-links,
+.in-motion-grid.is-exploring .hero-formula-links,
 .hero-product:focus-within .hero-formula-links {
   opacity: 1;
 }
 
 .hero-product:hover .hero-link,
-.hero-product.is-exploring .hero-link,
+.in-motion-grid.is-exploring .hero-link,
 .hero-product:focus-within .hero-link {
   opacity: .55;
 }
 
 .hero-product:hover .hero-product-img,
-.hero-product.is-exploring .hero-product-img,
+.in-motion-grid.is-exploring .hero-product-img,
 .hero-product:focus-within .hero-product-img {
   filter: drop-shadow(0 36px 72px rgba(0, 0, 0, .78)) drop-shadow(0 0 48px rgba(232, 255, 58, .12));
 }
 
 .hero-product:hover .hero-ingredients,
-.hero-product.is-exploring .hero-ingredients,
+.in-motion-grid.is-exploring .hero-ingredients,
 .hero-product:focus-within .hero-ingredients {
   pointer-events: auto;
 }
 
 .hero-product:hover .hero-ingredient,
-.hero-product.is-exploring .hero-ingredient,
+.in-motion-grid.is-exploring .hero-ingredient,
 .hero-product:focus-within .hero-ingredient {
   opacity: .82;
   transform: scale(.94) translateY(0);
@@ -534,37 +534,42 @@ button, input, select { font: inherit; }
 .hero-ingredient--potassium { top: 48%; right: -2%; left: auto; width: clamp(86px, 21%, 132px); transition-delay: 220ms; }
 
 .hero-formula-panel {
-  margin-top: 14px;
-  padding: 16px 18px 18px;
-  min-height: 148px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  padding: 28px 28px 30px;
+  box-sizing: border-box;
+  text-align: left;
   border: 1px solid rgba(232, 255, 58, .14);
   background: linear-gradient(180deg, rgba(232, 255, 58, .06), rgba(8, 8, 8, .92));
   clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
-  opacity: .72;
-  transform: translateY(6px);
-  transition: opacity .35s ease, transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+  opacity: 1;
+  transform: none;
+  transition: border-color .35s ease, box-shadow .35s ease;
 }
 
 .hero-formula-eyebrow {
-  margin: 0 0 6px;
-  font-family: var(--label-sans);
-  font-size: .68rem;
-  font-weight: 600;
-  letter-spacing: .24em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-
-.hero-formula-name {
-  margin: 0 0 8px;
-  font-family: var(--label-serif);
+  margin: 0 0 18px;
+  font-family: var(--display);
+  font-size: clamp(1.7rem, 3.6vw, 3.1rem);
   font-weight: 400;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  line-height: .95;
+  line-height: .92;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: #fff;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .55);
+  white-space: nowrap;
+}
+
+.hero-formula-name {
+  margin: 0 0 10px;
+  font-family: var(--label-serif);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  line-height: 1.05;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--lime);
   transition: opacity .2s ease, transform .2s ease;
 }
 
@@ -579,8 +584,9 @@ button, input, select { font: inherit; }
 }
 
 .hero-formula-study {
-  margin: 12px 0 0;
-  padding-top: 10px;
+  margin-top: auto;
+  flex-shrink: 0;
+  padding-top: 12px;
   border-top: 1px solid rgba(232, 255, 58, .14);
   font-family: var(--label-sans);
   font-size: .68rem;
@@ -593,22 +599,21 @@ button, input, select { font: inherit; }
 }
 
 .hero-formula-study[hidden] {
-  display: none;
+  display: block;
+  visibility: hidden;
 }
 
-.hero-product:hover .hero-formula-panel,
-.hero-product.is-exploring .hero-formula-panel,
-.hero-product:focus-within .hero-formula-panel,
-.hero-product.has-selection .hero-formula-panel {
-  opacity: 1;
-  transform: translateY(0);
+.in-motion-grid:has(.hero-product:hover) .hero-formula-panel,
+.in-motion-grid.is-exploring .hero-formula-panel,
+.in-motion-grid:focus-within .hero-formula-panel,
+.in-motion-grid.has-selection .hero-formula-panel {
   border-color: rgba(232, 255, 58, .32);
   box-shadow: 0 16px 40px rgba(0, 0, 0, .35);
 }
 
-.hero-product.has-selection .hero-formula-name,
-.hero-product.has-selection .hero-formula-copy,
-.hero-product.has-selection .hero-formula-study {
+.in-motion-grid.has-selection .hero-formula-name,
+.in-motion-grid.has-selection .hero-formula-copy,
+.in-motion-grid.has-selection .hero-formula-study {
   animation: heroPanelSwap .32s ease;
 }
 
@@ -625,7 +630,7 @@ button, input, select { font: inherit; }
 }
 
 .hero-product:hover .hero-ingredient-hint,
-.hero-product.is-exploring .hero-ingredient-hint,
+.in-motion-grid.is-exploring .hero-ingredient-hint,
 .hero-product:focus-within .hero-ingredient-hint {
   opacity: 0;
 }
@@ -833,7 +838,6 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   margin-top: 0;
 }
 
-.in-motion-copy .cta-link,
 .science-copy .cta-link {
   margin-top: 18px;
 }
@@ -906,15 +910,9 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   width: 100%;
 }
 
-.in-motion-copy {
-  margin-bottom: 0;
-}
-
-.in-motion-copy p:last-child {
-  margin-bottom: 0;
-  color: var(--muted);
-  font-size: 1.05rem;
-  line-height: 1.6;
+.in-motion .hero-formula-panel {
+  width: 100%;
+  max-width: 560px;
 }
 
 .in-motion .hero-product {
@@ -2268,9 +2266,14 @@ select {
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  .in-motion-copy {
+  .in-motion .hero-formula-panel {
     text-align: center;
     margin-inline: auto;
+    max-width: min(100%, 560px);
+  }
+  .in-motion .hero-formula-eyebrow {
+    margin-inline: auto;
+    font-size: clamp(1.25rem, 6.8vw, 2.4rem);
   }
   h1 { max-width: none; margin-inline: auto; }
   h1 em { display: block; }
@@ -2336,7 +2339,7 @@ select {
     animation: none !important;
   }
   .hero-product:hover .hero-ingredient,
-  .hero-product.is-exploring .hero-ingredient,
+  .in-motion-grid.is-exploring .hero-ingredient,
   .hero-product:focus-within .hero-ingredient {
     opacity: .82;
     transform: none;

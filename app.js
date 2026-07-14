@@ -86,6 +86,7 @@ counters.forEach((counter) => counterObserver.observe(counter));
 
 if (heroInteractive) {
   const heroIngredients = heroInteractive.querySelectorAll(".hero-ingredient");
+  const formulaPanel = heroInteractive.querySelector(".hero-formula-panel");
   const formulaName = heroInteractive.querySelector("[data-hero-formula-name]");
   const formulaCopy = heroInteractive.querySelector("[data-hero-formula-copy]");
   const formulaStudy = heroInteractive.querySelector("[data-hero-formula-study]");
@@ -115,6 +116,50 @@ if (heroInteractive) {
     }
     heroInteractive.classList.remove("has-selection");
   }
+
+  function lockFormulaPanelHeight() {
+    if (!formulaPanel || !formulaName || !formulaCopy) return;
+
+    formulaPanel.style.height = "auto";
+    if (formulaStudy) formulaStudy.style.minHeight = "";
+
+    let tallestPanel = 0;
+    let tallestStudy = 0;
+
+    heroIngredients.forEach((button) => {
+      formulaName.textContent = button.dataset.name || defaultName;
+      formulaCopy.textContent = button.dataset.desc || defaultCopy;
+      if (formulaStudy) {
+        const study = button.dataset.study || "";
+        formulaStudy.textContent = study ? `Study: ${study}` : "";
+        formulaStudy.hidden = !study;
+        if (study) tallestStudy = Math.max(tallestStudy, formulaStudy.offsetHeight);
+      }
+      tallestPanel = Math.max(tallestPanel, formulaPanel.offsetHeight);
+    });
+
+    formulaName.textContent = defaultName;
+    formulaCopy.textContent = defaultCopy;
+    if (formulaStudy) {
+      formulaStudy.textContent = "";
+      formulaStudy.hidden = true;
+      if (tallestStudy > 0) formulaStudy.style.minHeight = `${tallestStudy}px`;
+    }
+
+    formulaPanel.offsetHeight; // force layout with reserved study footer
+    tallestPanel = Math.max(tallestPanel, formulaPanel.offsetHeight);
+    if (tallestPanel > 0) formulaPanel.style.height = `${tallestPanel}px`;
+  }
+
+  let formulaResizeTimer = 0;
+  const scheduleFormulaPanelLock = () => {
+    window.clearTimeout(formulaResizeTimer);
+    formulaResizeTimer = window.setTimeout(lockFormulaPanelHeight, 120);
+  };
+
+  lockFormulaPanelHeight();
+  if (document.fonts?.ready) document.fonts.ready.then(lockFormulaPanelHeight);
+  window.addEventListener("resize", scheduleFormulaPanelLock);
 
   heroInteractive.addEventListener("mouseenter", () => {
     heroInteractive.classList.add("is-exploring");
