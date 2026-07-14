@@ -121,6 +121,10 @@ if (heroInteractive) {
     if (!formulaPanel || !formulaName || !formulaCopy) return;
 
     formulaPanel.style.height = "auto";
+    formulaPanel.style.maxHeight = "";
+    formulaPanel.style.overflow = "";
+    formulaPanel.style.overflowX = "";
+    formulaPanel.style.overflowY = "";
     if (formulaStudy) formulaStudy.style.minHeight = "";
 
     let tallestPanel = 0;
@@ -148,7 +152,15 @@ if (heroInteractive) {
 
     formulaPanel.offsetHeight; // force layout with reserved study footer
     tallestPanel = Math.max(tallestPanel, formulaPanel.offsetHeight);
-    if (tallestPanel > 0) formulaPanel.style.height = `${tallestPanel}px`;
+
+    const viewportCap = Math.round((window.visualViewport?.height || window.innerHeight) * 0.42);
+    if (tallestPanel > 0) {
+      const locked = Math.min(tallestPanel, Math.max(160, viewportCap));
+      formulaPanel.style.height = `${locked}px`;
+      formulaPanel.style.maxHeight = `${locked}px`;
+      formulaPanel.style.overflowX = "visible";
+      formulaPanel.style.overflowY = locked < tallestPanel ? "auto" : "";
+    }
   }
 
   let formulaResizeTimer = 0;
