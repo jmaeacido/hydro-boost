@@ -373,6 +373,45 @@ button, .button, .cta-chip, .sticky-buy, .hero-ingredient, .meet-ingredient, .in
   transition: opacity .3s ease, stroke .25s ease;
 }
 
+.hero-orbit-3d {
+  position: absolute;
+  inset: -6%;
+  z-index: 4;
+}
+
+.hero-orbit-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* When the WebGL scene is live, the flat bottle/link overlay steps aside. */
+.hero-product-stage.has-3d .hero-product-visual,
+.hero-product-stage.has-3d .hero-formula-links,
+.hero-product-stage.has-3d .hero-orbit-ring,
+.hero-product-stage.has-3d .hero-product-aura {
+  display: none;
+}
+
+/* The 2D overlay must never intercept the canvas: it sits at a higher z-index. */
+.hero-product-stage.has-3d .hero-ingredients {
+  pointer-events: none !important;
+}
+
+.hero-product-stage.has-3d .hero-ingredient {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.hero-product-stage.has-3d .hero-ingredient:focus-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.hero-orbit-3d--failed {
+  display: none;
+}
+
 .hero-product-visual {
   position: absolute;
   top: 52%;

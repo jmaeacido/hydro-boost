@@ -75,6 +75,7 @@
           <div class="hero-product-stage">
             <div class="hero-product-aura" aria-hidden="true"></div>
             <div class="hero-orbit-ring" aria-hidden="true"></div>
+            <div class="hero-orbit-3d" data-hero-orbit aria-hidden="true"></div>
             <div class="hero-product-visual">
               <img class="hero-product-img" src="assets/hero-bottle-gummies_dark.png" alt="Hydro Boost lemon lime electrolyte gummies bottle with gummies" width="1024" height="1024">
             </div>
@@ -86,34 +87,34 @@
               <line class="hero-link hero-link--potassium" x1="50" y1="52" x2="86" y2="64"></line>
             </svg>
             <div class="hero-ingredients" role="group" aria-label="Formula ingredients">
-              <button type="button" class="hero-ingredient hero-ingredient--cordyceps" data-name="Cordyceps" data-desc="Research associates Cordyceps militaris with better high-intensity exercise tolerance, including gains in VO₂max after consistent use." data-study="Hirsch et al., Journal of Dietary Supplements, 2016 (PMC5236007)">
+              <button type="button" class="hero-ingredient hero-ingredient--cordyceps" data-ingredient-key="cordyceps" data-name="Cordyceps" data-desc="Research associates Cordyceps militaris with better high-intensity exercise tolerance, including gains in VO₂max after consistent use." data-study="Hirsch et al., Journal of Dietary Supplements, 2016 (PMC5236007)">
                 <span class="hero-ingredient-ring" aria-hidden="true"></span>
                 <span class="hero-ingredient-media"><img src="assets/ingredients/cordyceps.jpg" alt="" width="160" height="160" loading="lazy"></span>
                 <span class="hero-ingredient-name">Cordyceps</span>
               </button>
-              <button type="button" class="hero-ingredient hero-ingredient--magnesium" data-name="Magnesium" data-desc="Magnesium is required for normal muscle contraction, nerve signaling, and ATP energy metabolism — systems that take a hit during hard training." data-study="NIH Office of Dietary Supplements — Magnesium Fact Sheet">
+              <button type="button" class="hero-ingredient hero-ingredient--magnesium" data-ingredient-key="magnesium" data-name="Magnesium" data-desc="Magnesium is required for normal muscle contraction, nerve signaling, and ATP energy metabolism — systems that take a hit during hard training." data-study="NIH Office of Dietary Supplements — Magnesium Fact Sheet">
                 <span class="hero-ingredient-ring" aria-hidden="true"></span>
                 <span class="hero-ingredient-media"><img src="assets/ingredients/magnesium.jpg" alt="" width="160" height="160" loading="lazy"></span>
                 <span class="hero-ingredient-name">Magnesium</span>
               </button>
-              <button type="button" class="hero-ingredient hero-ingredient--sodium" data-name="Sodium" data-desc="During prolonged or heavy sweating, sodium replacement helps maintain fluid balance and reduce the risk of hyponatremia from water-only intake." data-study="ACSM Position Stand: Exercise and Fluid Replacement (Sawka et al., 2007)">
+              <button type="button" class="hero-ingredient hero-ingredient--sodium" data-ingredient-key="sodium" data-name="Sodium" data-desc="During prolonged or heavy sweating, sodium replacement helps maintain fluid balance and reduce the risk of hyponatremia from water-only intake." data-study="ACSM Position Stand: Exercise and Fluid Replacement (Sawka et al., 2007)">
                 <span class="hero-ingredient-ring" aria-hidden="true"></span>
                 <span class="hero-ingredient-media"><img src="assets/ingredients/sodium.jpg" alt="" width="160" height="160" loading="lazy"></span>
                 <span class="hero-ingredient-name">Sodium</span>
               </button>
-              <button type="button" class="hero-ingredient hero-ingredient--maca" data-name="Black Maca" data-desc="In athletic populations, maca supplementation has been studied for supporting training motivation, desire to perform, and overall activity." data-study="Stone et al., Journal of Ethnopharmacology, 2009">
+              <button type="button" class="hero-ingredient hero-ingredient--maca" data-ingredient-key="maca" data-name="Black Maca" data-desc="In athletic populations, maca supplementation has been studied for supporting training motivation, desire to perform, and overall activity." data-study="Stone et al., Journal of Ethnopharmacology, 2009">
                 <span class="hero-ingredient-ring" aria-hidden="true"></span>
                 <span class="hero-ingredient-media"><img src="assets/ingredients/maca.png" alt="" width="160" height="160" loading="lazy"></span>
                 <span class="hero-ingredient-name">Black Maca</span>
               </button>
-              <button type="button" class="hero-ingredient hero-ingredient--potassium" data-name="Potassium" data-desc="Potassium works with sodium to maintain cellular fluid balance and support normal muscle and nerve function as you rehydrate." data-study="NIH Office of Dietary Supplements — Potassium Fact Sheet">
+              <button type="button" class="hero-ingredient hero-ingredient--potassium" data-ingredient-key="potassium" data-name="Potassium" data-desc="Potassium works with sodium to maintain cellular fluid balance and support normal muscle and nerve function as you rehydrate." data-study="NIH Office of Dietary Supplements — Potassium Fact Sheet">
                 <span class="hero-ingredient-ring" aria-hidden="true"></span>
                 <span class="hero-ingredient-media"><img src="assets/ingredients/potassium.jpg" alt="" width="160" height="160" loading="lazy"></span>
                 <span class="hero-ingredient-name">Potassium</span>
               </button>
             </div>
           </div>
-          <p class="hero-ingredient-hint">Tap or hover the bottle to reveal ingredients</p>
+          <p class="hero-ingredient-hint">Drag to rotate &middot; tap an ingredient to see the science</p>
         </div>
       </div>
     </section>
@@ -617,5 +618,14 @@
   <a class="sticky-buy" href="https://www.buyhydroboost.com/product-page/hydro-boost">Fuel Up</a>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="app.js" defer></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="hero-orbit-3d.js"></script>
 </body>
 </html>

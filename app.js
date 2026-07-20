@@ -182,6 +182,8 @@ if (heroInteractive) {
 
   heroInteractive.addEventListener("mouseleave", () => {
     heroInteractive.classList.remove("is-exploring");
+    // Keep a clicked formula selection (3D orbit locks via has-selection).
+    if (heroInteractive.classList.contains("has-selection")) return;
     heroIngredients.forEach((item) => item.classList.remove("is-focused"));
     resetFormulaPanel();
   });
@@ -230,6 +232,19 @@ if (heroInteractive) {
     );
     exploreObserver.observe(heroInteractive);
   }
+
+  // Bridge for the WebGL orbit module (hero-orbit-3d.js) to drive the formula panel.
+  window.__heroOrbitBridge = {
+    ingredients: Array.from(heroIngredients),
+    focus(button) {
+      heroIngredients.forEach((item) => item.classList.toggle("is-focused", item === button));
+      setFormulaPanel(button);
+    },
+    blur() {
+      heroIngredients.forEach((item) => item.classList.remove("is-focused"));
+      resetFormulaPanel();
+    }
+  };
 }
 
 const meetInteractive = document.querySelector("[data-meet-ingredients]");
