@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
-const MODEL_URL = "assets/3D%20resources/hydroboost.glb?v=gummies30-20260720-1817";
+const MODEL_URL = "assets/3D%20resources/optimized-models/hydroboost-optimized.glb";
 const ASSET_BASE = "assets/3D%20resources/";
 const ENV_URL = "assets/hdri/artist_workshop_1k.hdr";
 // Full-bleed in-motion section backdrop (dark green + grid), replaces CSS.
@@ -40,11 +40,11 @@ const INGREDIENT_ORDER = [
 ];
 
 const INGREDIENT_MODELS = {
-  maca: "black-maca.glb",
-  cordyceps: "cordycep.glb",
-  magnesium: "Mg.glb",
-  sodium: "Na.glb",
-  potassium: "K.glb"
+  maca: "optimized-models/black-maca-optimized.glb",
+  cordyceps: "optimized-models/cordycep-optimized.glb",
+  magnesium: "optimized-models/Mg-optimized.glb",
+  sodium: "optimized-models/Na-optimized.glb",
+  potassium: "optimized-models/K-optimized.glb"
 };
 
 function loadTexture(url) {
