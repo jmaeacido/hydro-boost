@@ -40,13 +40,12 @@ const INGREDIENT_ORDER = [
   "potassium"
 ];
 
-// Entries with an optimized build use the smaller file; originals fall back to ASSET_BASE.
 const INGREDIENT_MODELS = {
-  maca:      { file: "black-maca.glb",      base: ASSET_BASE },
-  cordyceps: { file: "cordycep.glb",         base: ASSET_BASE },
-  magnesium: { file: "Mg-optimized.glb",     base: ASSET_BASE_OPT },
-  sodium:    { file: "Na-optimized.glb",     base: ASSET_BASE_OPT },
-  potassium: { file: "K-optimized.glb",      base: ASSET_BASE_OPT },
+  maca:      { file: "black-maca-optimized.glb", base: ASSET_BASE_OPT },
+  cordyceps: { file: "cordycep-optimized.glb",   base: ASSET_BASE_OPT },
+  magnesium: { file: "Mg-optimized.glb",         base: ASSET_BASE_OPT },
+  sodium:    { file: "Na-optimized.glb",         base: ASSET_BASE_OPT },
+  potassium: { file: "K-optimized.glb",          base: ASSET_BASE_OPT },
 };
 
 // Smaller GLBs first so light orbs appear while the heavy electrolytes download.
