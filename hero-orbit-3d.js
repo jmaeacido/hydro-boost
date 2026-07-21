@@ -1,10 +1,19 @@
 import * as THREE from "three";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
 const MODEL_URL = "assets/3D%20resources/optimized-models/hydroboost-optimized.glb";
 const ASSET_BASE = "assets/3D%20resources/";
+const ASSET_BASE_OPT = "assets/3D%20resources/optimized-models/";
 const ENV_URL = "assets/hdri/artist_workshop_1k.hdr";
+const DRACO_DECODER_PATH = "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/";
+
+function createGltfLoader() {
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath(DRACO_DECODER_PATH);
+  return new GLTFLoader().setDRACOLoader(dracoLoader);
+}
 // Full-bleed in-motion section backdrop (dark green + grid), replaces CSS.
 const PAGE_BG_HEX = "#0b1209";
 const PAGE_BG = 0x0b1209;
@@ -40,11 +49,11 @@ const INGREDIENT_ORDER = [
 ];
 
 const INGREDIENT_MODELS = {
-  maca: "optimized-models/black-maca-optimized.glb",
-  cordyceps: "optimized-models/cordycep-optimized.glb",
-  magnesium: "optimized-models/Mg-optimized.glb",
-  sodium: "optimized-models/Na-optimized.glb",
-  potassium: "optimized-models/K-optimized.glb"
+  maca: "black-maca-optimized.glb",
+  cordyceps: "cordycep-optimized.glb",
+  magnesium: "Mg-optimized.glb",
+  sodium: "Na-optimized.glb",
+  potassium: "K-optimized.glb"
 };
 
 function loadTexture(url) {
@@ -578,7 +587,7 @@ export function initHeroOrbit3d(container, options = {}) {
   }
 
   async function buildModel() {
-    const gltf = await new GLTFLoader().loadAsync(MODEL_URL);
+    const gltf = await createGltfLoader().loadAsync(MODEL_URL);
     const model = gltf.scene;
 
     // Only strip physics-sim leftovers; materials/textures stay as exported.
@@ -621,7 +630,7 @@ export function initHeroOrbit3d(container, options = {}) {
   }
 
   async function buildOrbs() {
-    const loader = new GLTFLoader();
+    const loader = createGltfLoader();
     const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
     const ingredientSources = await Promise.all(
@@ -633,7 +642,7 @@ export function initHeroOrbit3d(container, options = {}) {
 
         if (modelFile) {
           try {
-            const gltf = await loader.loadAsync(`${ASSET_BASE}${encodeURIComponent(modelFile)}`);
+            const gltf = await loader.loadAsync(`${ASSET_BASE_OPT}${encodeURIComponent(modelFile)}`);
             model = gltf.scene;
             model.traverse((obj) => {
               if (!obj.isMesh || !obj.material) return;
