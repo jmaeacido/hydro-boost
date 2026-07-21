@@ -15,8 +15,20 @@ const STRAY_GUMMY_MIN_Y = 6;
 const MODEL_TARGET_HEIGHT = 2.55;
 const ORBIT_RADIUS = 1.72;
 const ORB_MODEL_SIZE = 0.42;
-const ORB_HIT_RADIUS = 0.38;
+const ORB_HIT_RADIUS = 0.55;
+const ORB_SHELL_RADIUS = 0.28;
+const ORBIT_TILT = 0.42;
 const DRAG_THRESHOLD_PX = 6;
+// Click can be a bit forgiving; hover-pause must stay tight so idle spin doesn't die early.
+const PICK_RADIUS_PX = 56;
+const PICK_RADIUS_TOUCH_PX = 70;
+const HOVER_RADIUS_PX = 40;
+const HOVER_RADIUS_TOUCH_PX = 50;
+// Left-front of the jar (toward the formula panel), in orbit XZ atan2(z, x) space.
+const FOCUS_AZIMUTH = Math.PI * 0.72;
+const SNAP_DURATION_MS = 720;
+const FOCUS_SCALE = 1.34;
+const DIM_SCALE = 0.84;
 
 // Equal angular spacing around the shared orbit (72° apart).
 const INGREDIENT_ORDER = [
@@ -221,14 +233,15 @@ export function initHeroOrbit3d(container, options = {}) {
   }
 
   const orbitRing = new THREE.Mesh(
-    new THREE.TorusGeometry(ORBIT_RADIUS, 0.008, 12, 120),
+    new THREE.TorusGeometry(ORBIT_RADIUS, 0.01, 12, 120),
     new THREE.MeshBasicMaterial({
       color: 0xe8ff3a,
       transparent: true,
-      opacity: 0.18
+      opacity: 0.28
     })
   );
-  orbitRing.rotation.x = Math.PI / 2.35;
+  // Torus defaults to XY; lay it in the orbitPivot XZ plane so orbs sit on it.
+  orbitRing.rotation.x = Math.PI / 2;
 
   // One turntable: rotating the bottle also rotates the ingredient orbit.
   const turntable = new THREE.Group();
@@ -236,15 +249,18 @@ export function initHeroOrbit3d(container, options = {}) {
 
   const bottleGroup = new THREE.Group();
   turntable.add(bottleGroup);
-  turntable.add(orbitRing);
 
   const orbitPivot = new THREE.Group();
-  orbitPivot.rotation.x = 0.42;
+  orbitPivot.rotation.x = ORBIT_TILT;
   turntable.add(orbitPivot);
+  orbitPivot.add(orbitRing);
 
   const ingredientMeshes = [];
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2(999, 999);
+  const pickWorld = new THREE.Vector3();
+  let lastClientX = 0;
+  let lastClientY = 0;
   let hoveredMesh = null;
   let focusedKey = null;
   let lockedKey = null;
@@ -259,9 +275,39 @@ export function initHeroOrbit3d(container, options = {}) {
   let pointerDownY = 0;
   let lastPointerX = 0;
   let activePointerId = null;
+  let snapActive = false;
+  let snapFromYaw = 0;
+  let snapToYaw = 0;
+  let snapStartMs = 0;
+  const snapWorldPos = new THREE.Vector3();
   let resizeObserver = null;
   let exploreObserver = null;
   let visibilityObserver = null;
+
+  function shortestAngleDelta(from, to) {
+    return Math.atan2(Math.sin(to - from), Math.cos(to - from));
+  }
+
+  function cancelSnap() {
+    snapActive = false;
+  }
+
+  function snapIngredientToFront(key) {
+    const entry = ingredientMeshes.find((item) => item.key === key);
+    if (!entry) return;
+    // Sync matrices, then measure the orb's current world azimuth so tilt is included.
+    turntable.rotation.y = turntableYaw;
+    turntable.updateMatrixWorld(true);
+    entry.group.getWorldPosition(snapWorldPos);
+    const currentAzimuth = Math.atan2(snapWorldPos.z, snapWorldPos.x);
+    // Increasing turntable yaw by d rotates world azimuth by -d.
+    const deltaYaw = shortestAngleDelta(0, currentAzimuth - FOCUS_AZIMUTH);
+    snapFromYaw = turntableYaw;
+    snapToYaw = turntableYaw + deltaYaw;
+    snapStartMs = performance.now();
+    snapActive = true;
+    dragVelocity = 0;
+  }
 
   function setExploring(next) {
     isExploring = next;
@@ -269,10 +315,6 @@ export function initHeroOrbit3d(container, options = {}) {
 
   function setFocusedIngredient(key) {
     focusedKey = key || null;
-    ingredientMeshes.forEach((entry) => {
-      const active = !key || entry.key === key;
-      entry.group.scale.setScalar(active && key ? 1.12 : 1);
-    });
   }
 
   function resize() {
@@ -289,16 +331,61 @@ export function initHeroOrbit3d(container, options = {}) {
 
   function updatePointer(event) {
     const rect = renderer.domElement.getBoundingClientRect();
+    lastClientX = event.clientX;
+    lastClientY = event.clientY;
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   }
 
+  function screenPick(object3d, rect) {
+    object3d.getWorldPosition(pickWorld);
+    pickWorld.project(camera);
+    if (pickWorld.z < -1 || pickWorld.z > 1) {
+      return { dist: Infinity, depth: 1 };
+    }
+    const sx = rect.left + ((pickWorld.x + 1) / 2) * rect.width;
+    const sy = rect.top + ((1 - pickWorld.y) / 2) * rect.height;
+    return {
+      dist: Math.hypot(lastClientX - sx, lastClientY - sy),
+      depth: pickWorld.z
+    };
+  }
+
+  function nearestIngredient(maxDist) {
+    if (!ingredientMeshes.length) return null;
+    const rect = renderer.domElement.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+
+    let bestKey = null;
+    let bestScore = Infinity;
+
+    for (const entry of ingredientMeshes) {
+      const orb = screenPick(entry.group, rect);
+      const label = entry.label ? screenPick(entry.label, rect) : { dist: Infinity, depth: 1 };
+      const dist = Math.min(orb.dist, label.dist);
+      if (dist > maxDist) continue;
+      // Prefer nearer cursor hits; when close, bias toward the front-most orb.
+      const depth = orb.dist <= label.dist ? orb.depth : label.depth;
+      const score = dist + depth * 20;
+      if (score < bestScore) {
+        bestScore = score;
+        bestKey = entry.key;
+      }
+    }
+    return bestKey;
+  }
+
   function pickIngredient() {
+    const maxDist = touchMode.matches ? PICK_RADIUS_TOUCH_PX : PICK_RADIUS_PX;
+    const screenHit = nearestIngredient(maxDist);
+    if (screenHit) return screenHit;
+
     raycaster.setFromCamera(pointer, camera);
     const targets = [];
     ingredientMeshes.forEach((entry) => {
       targets.push(entry.hit);
       if (entry.shell) targets.push(entry.shell);
+      if (entry.label) targets.push(entry.label);
       if (entry.modelRoot) targets.push(entry.modelRoot);
       if (entry.core) targets.push(entry.core);
     });
@@ -313,12 +400,20 @@ export function initHeroOrbit3d(container, options = {}) {
     return null;
   }
 
+  function hoverIngredient() {
+    const maxDist = touchMode.matches ? HOVER_RADIUS_TOUCH_PX : HOVER_RADIUS_PX;
+    return nearestIngredient(maxDist);
+  }
+
   function selectIngredient(key) {
-    if (!key || key === lockedKey) return;
-    lockedKey = key;
-    const button = ingredientButtons.find((item) => item.dataset.ingredientKey === key);
-    if (button) onIngredientFocus(button);
-    setFocusedIngredient(key);
+    if (!key) return;
+    if (key !== lockedKey) {
+      lockedKey = key;
+      const button = ingredientButtons.find((item) => item.dataset.ingredientKey === key);
+      if (button) onIngredientFocus(button);
+      setFocusedIngredient(key);
+    }
+    snapIngredientToFront(key);
   }
 
   function syncHoverCursor(key) {
@@ -350,6 +445,7 @@ export function initHeroOrbit3d(container, options = {}) {
       if (!isDragging && Math.hypot(dx, dy) > DRAG_THRESHOLD_PX) {
         isDragging = true;
         dragMoved = true;
+        cancelSnap();
         syncHoverCursor(null);
       }
       if (isDragging) {
@@ -363,7 +459,7 @@ export function initHeroOrbit3d(container, options = {}) {
     }
 
     lastPointerX = event.clientX;
-    const key = pickIngredient();
+    const key = hoverIngredient();
     if (key === hoveredMesh) {
       syncHoverCursor(key);
       return;
@@ -385,7 +481,7 @@ export function initHeroOrbit3d(container, options = {}) {
     if (!wasDrag) {
       selectIngredient(pickIngredient());
     }
-    syncHoverCursor(pickIngredient());
+    syncHoverCursor(hoverIngredient());
   }
 
   function handlePointerLeave() {
@@ -404,18 +500,24 @@ export function initHeroOrbit3d(container, options = {}) {
 
     const time = timeMs * 0.001;
 
-    // Coast after a drag; auto-spin is brisk when idle and eases off on hover
-    // so orbs are easy to aim at.
-    if (!isDragging) {
+    // Snap selected orb to the focus slot; otherwise coast / auto-spin.
+    if (snapActive) {
+      const t = Math.min(1, (timeMs - snapStartMs) / SNAP_DURATION_MS);
+      const eased = 1 - (1 - t) ** 3;
+      turntableYaw = snapFromYaw + (snapToYaw - snapFromYaw) * eased;
+      if (t >= 1) cancelSnap();
+    } else if (!isDragging) {
+      // Coast after a drag; auto-spin is brisk when idle and eases off on hover
+      // so orbs are easy to aim at.
       if (Math.abs(dragVelocity) > 0.0004) {
         turntableYaw += dragVelocity;
         dragVelocity *= 0.94;
       } else {
         dragVelocity = 0;
-        if (hoveredMesh) {
-          // hold still while aiming at an orb
-        } else {
-          turntableYaw += isExploring ? 0.0012 : 0.0038;
+        // Only freeze when the pointer is tightly over an orb — stage hover
+        // no longer throttles the whole turntable.
+        if (!hoveredMesh) {
+          turntableYaw += 0.0056;
         }
       }
     }
@@ -426,39 +528,49 @@ export function initHeroOrbit3d(container, options = {}) {
       const reveal = entry.group.userData.targetOpacity ?? 1;
       const delay = entry.group.userData.revealDelay ?? 0;
       const easedReveal = THREE.MathUtils.clamp(reveal - delay, 0, 1);
-      const dimmed = focusedKey && entry.key !== focusedKey;
+      const isActive = Boolean(focusedKey && entry.key === focusedKey);
+      const dimmed = Boolean(focusedKey && entry.key !== focusedKey);
       entry.group.visible = easedReveal > 0.01;
 
-      const shellTarget = easedReveal * (dimmed ? 0.28 : 0.55);
+      const targetScale = isActive ? FOCUS_SCALE : dimmed ? DIM_SCALE : 1;
+      const nextScale = THREE.MathUtils.lerp(entry.group.scale.x, targetScale, 0.14);
+      entry.group.scale.setScalar(nextScale);
+
+      const shellTarget = easedReveal * (isActive ? 0.78 : dimmed ? 0.14 : 0.5);
       entry.shell.material.opacity = THREE.MathUtils.lerp(
         entry.shell.material.opacity,
         shellTarget,
-        0.08
+        0.1
+      );
+      entry.shell.scale.setScalar(
+        THREE.MathUtils.lerp(entry.shell.scale.x, isActive ? 1.08 : 1, 0.12)
       );
 
-      const contentTarget = easedReveal * (dimmed ? 0.4 : 1);
+      const contentTarget = easedReveal * (isActive ? 1 : dimmed ? 0.28 : 1);
       if (entry.modelRoot) {
         const current = entry.modelRoot.userData.opacity ?? 0;
-        const next = THREE.MathUtils.lerp(current, contentTarget, 0.08);
+        const next = THREE.MathUtils.lerp(current, contentTarget, 0.1);
         entry.modelRoot.userData.opacity = next;
         setMeshOpacity(entry.modelRoot, next);
+        entry.modelRoot.rotation.y = time * 0.55 + entry.phase;
       } else if (entry.core) {
         entry.core.material.opacity = THREE.MathUtils.lerp(
           entry.core.material.opacity,
           contentTarget,
-          0.08
+          0.1
         );
       }
 
+      const labelTarget = easedReveal * (isActive ? 1 : dimmed ? 0.18 : 0.9);
       entry.label.material.opacity = THREE.MathUtils.lerp(
         entry.label.material.opacity,
-        easedReveal * (dimmed ? 0.35 : 0.95),
-        0.08
+        labelTarget,
+        0.1
       );
-      entry.group.position.y = Math.sin(time * 1.6 + entry.phase) * 0.04;
-      if (entry.modelRoot) {
-        entry.modelRoot.rotation.y = time * 0.55 + entry.phase;
-      }
+      const labelScale = isActive ? 1.22 : dimmed ? 0.9 : 1;
+      entry.label.scale.setScalar(
+        THREE.MathUtils.lerp(entry.label.scale.x, labelScale, 0.12)
+      );
       entry.label.lookAt(camera.position);
     });
 
@@ -584,7 +696,7 @@ export function initHeroOrbit3d(container, options = {}) {
       hit.userData.ingredientKey = source.key;
 
       const shell = new THREE.Mesh(
-        new THREE.SphereGeometry(0.28, 32, 32),
+        new THREE.SphereGeometry(ORB_SHELL_RADIUS, 32, 32),
         new THREE.MeshPhysicalMaterial({
           color: 0xffffff,
           transparent: true,
@@ -661,12 +773,13 @@ export function initHeroOrbit3d(container, options = {}) {
 
       group.add(hit, shell, label);
 
+      // Center of each orb sits on the shared orbit ring (local XZ in orbitPivot).
       group.position.set(
         Math.cos(source.angle) * ORBIT_RADIUS,
-        0.1,
+        0,
         Math.sin(source.angle) * ORBIT_RADIUS
       );
-      group.lookAt(0, 0.1, 0);
+      group.lookAt(0, 0, 0);
 
       orbitPivot.add(group);
       ingredientMeshes.push({
@@ -751,6 +864,7 @@ export function initHeroOrbit3d(container, options = {}) {
     setExploring,
     clearSelection() {
       lockedKey = null;
+      cancelSnap();
       setFocusedIngredient(null);
     },
     getOrbScreenPositions() {
