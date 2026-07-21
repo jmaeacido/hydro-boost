@@ -679,11 +679,13 @@ button, .button, .cta-chip, .sticky-buy, .hero-ingredient, .meet-ingredient, .in
 
 .hero-formula-copy {
   margin: 0;
-  font-family: var(--label-serif);
+  font-family: var(--body);
   font-weight: 400;
   color: var(--muted);
   font-size: .92rem;
-  line-height: 1.5;
+  line-height: 1.55;
+  letter-spacing: .01em;
+  text-transform: none;
   transition: opacity .2s ease, transform .2s ease;
 }
 
