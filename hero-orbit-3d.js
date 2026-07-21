@@ -50,7 +50,6 @@ const INGREDIENT_MODELS = {
 // Smaller GLBs first so light orbs appear while the heavy electrolytes download.
 const ORB_LOAD_PRIORITY = ["cordyceps", "maca", "magnesium", "sodium", "potassium"];
 const ORB_LOAD_CONCURRENCY = 2;
-const ORB_LOAD_VIEWPORT_MARGIN = "400px 0px";
 
 function loadTexture(url) {
   return new Promise((resolve, reject) => {
@@ -288,7 +287,6 @@ export function initHeroOrbit3d(container, options = {}) {
   let resizeObserver = null;
   let exploreObserver = null;
   let visibilityObserver = null;
-  let orbLoadObserver = null;
   let orbsStarted = false;
 
   function shortestAngleDelta(from, to) {
@@ -836,6 +834,7 @@ export function initHeroOrbit3d(container, options = {}) {
     .then(() => {
       stage.classList.add("has-3d");
       section?.classList.add("has-webgl-bg");
+      startOrbLoading();
     })
     .catch((err) => {
       console.error("[hero-orbit-3d]", err);
@@ -843,17 +842,6 @@ export function initHeroOrbit3d(container, options = {}) {
       section?.classList.remove("has-webgl-bg");
       container.classList.add("hero-orbit-3d--failed");
     });
-
-  orbLoadObserver = new IntersectionObserver(
-    ([entry]) => {
-      if (!entry.isIntersecting) return;
-      startOrbLoading();
-      orbLoadObserver?.disconnect();
-      orbLoadObserver = null;
-    },
-    { rootMargin: ORB_LOAD_VIEWPORT_MARGIN, threshold: 0 }
-  );
-  orbLoadObserver.observe(container);
 
   resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(container);
@@ -892,7 +880,6 @@ export function initHeroOrbit3d(container, options = {}) {
       cancelAnimationFrame(animationId);
       resizeObserver?.disconnect();
       visibilityObserver?.disconnect();
-      orbLoadObserver?.disconnect();
       exploreObserver?.disconnect();
       stage.removeEventListener("pointerdown", handlePointerDown);
       stage.removeEventListener("pointermove", handlePointerMove);
