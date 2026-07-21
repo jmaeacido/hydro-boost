@@ -139,7 +139,12 @@ function paintPageBackground(canvas) {
 }
 
 export function initHeroOrbit3d(container, options = {}) {
-  warmOrbitAssets();
+  // Defer fetch hints until after load so they don't race the LCP image.
+  if (document.readyState === "complete") {
+    warmOrbitAssets();
+  } else {
+    window.addEventListener("load", warmOrbitAssets, { once: true });
+  }
   if (!container || prefersReducedMotion()) return null;
 
   const ingredientButtons = options.ingredients || [];

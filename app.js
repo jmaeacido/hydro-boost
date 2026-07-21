@@ -483,7 +483,8 @@ document.querySelectorAll(".gallery-card--hover-video").forEach((card) => {
 });
 
 const lottieTargets = document.querySelectorAll(".icon-lottie[data-src]");
-if (lottieTargets.length && window.lottie) {
+function initLottie() {
+  if (!lottieTargets.length || !window.lottie) return;
   lottieTargets.forEach((el) => {
     const isCycle = el.closest(".icon-cycle");
     const isRun = el.closest(".icon-run");
@@ -499,6 +500,11 @@ if (lottieTargets.length && window.lottie) {
     });
     if (reduceMotion) anim.goToAndStop(0, true);
   });
+}
+if (window.lottie) {
+  initLottie();
+} else {
+  document.querySelector('script[src*="lottie"]')?.addEventListener("load", initLottie);
 }
 
 const footerForm = document.querySelector("[data-footer-form]");
@@ -547,5 +553,28 @@ if (stickyBuy && heroSection) {
       { threshold: 0.08 }
     );
     footerStickyObserver.observe(footerEl);
+  }
+}
+
+const heroVideo = document.querySelector(".hero-bg-video");
+if (heroVideo && !reduceMotion) {
+  const startHeroVideo = () => {
+    if (heroVideo.dataset.loaded) return;
+    heroVideo.dataset.loaded = "1";
+    heroVideo.preload = "auto";
+    heroVideo.load();
+    heroVideo.play().catch(() => {});
+  };
+  const scheduleHeroVideo = () => {
+    if (typeof requestIdleCallback === "function") {
+      requestIdleCallback(startHeroVideo, { timeout: 2500 });
+    } else {
+      setTimeout(startHeroVideo, 800);
+    }
+  };
+  if (document.readyState === "complete") {
+    scheduleHeroVideo();
+  } else {
+    window.addEventListener("load", scheduleHeroVideo, { once: true });
   }
 }
