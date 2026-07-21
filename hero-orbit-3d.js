@@ -1,9 +1,15 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
-const MODEL_URL = "assets/3D%20resources/hydroboost.glb";
+const MODEL_URL = "assets/3D%20resources/hydroboost.glb?v=gummies30-20260720-1817";
 const ASSET_BASE = "assets/3D%20resources/";
+const ENV_URL = "assets/hdri/artist_workshop_1k.hdr";
+// Full-bleed in-motion section backdrop (dark green + grid), replaces CSS.
+const PAGE_BG_HEX = "#0b1209";
+const PAGE_BG = 0x0b1209;
+const PAGE_GRID_H = "rgba(232,255,58,0.035)";
+const PAGE_GRID_V = "rgba(232,255,58,0.025)";
 // The source scene keeps spare gummies parked high above the bottle (physics-sim leftovers).
 const STRAY_GUMMY_MIN_Y = 6;
 const MODEL_TARGET_HEIGHT = 2.55;
@@ -24,9 +30,9 @@ const INGREDIENT_ORDER = [
 const INGREDIENT_MODELS = {
   maca: "black-maca.glb",
   cordyceps: "cordycep.glb",
-  magnesium: "magnesium.glb",
-  sodium: "sodium.glb",
-  potassium: "potassium.glb"
+  magnesium: "Mg.glb",
+  sodium: "Na.glb",
+  potassium: "K.glb"
 };
 
 function loadTexture(url) {
@@ -64,6 +70,37 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/** Tiled section backdrop — flat fill + grid only (no per-tile wash; that stacked). */
+function paintPageBackground(canvas) {
+  const size = 512;
+  if (canvas.width !== size || canvas.height !== size) {
+    canvas.width = size;
+    canvas.height = size;
+  }
+
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = PAGE_BG_HEX;
+  ctx.fillRect(0, 0, size, size);
+
+  const step = size / 8;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = PAGE_GRID_V;
+  ctx.beginPath();
+  for (let x = 0; x <= size; x += step) {
+    ctx.moveTo(x + 0.5, 0);
+    ctx.lineTo(x + 0.5, size);
+  }
+  ctx.stroke();
+
+  ctx.strokeStyle = PAGE_GRID_H;
+  ctx.beginPath();
+  for (let y = 0; y <= size; y += step) {
+    ctx.moveTo(0, y + 0.5);
+    ctx.lineTo(size, y + 0.5);
+  }
+  ctx.stroke();
+}
+
 export function initHeroOrbit3d(container, options = {}) {
   if (!container || prefersReducedMotion()) return null;
 
@@ -72,14 +109,15 @@ export function initHeroOrbit3d(container, options = {}) {
   const onIngredientBlur = options.onIngredientBlur || (() => {});
   const touchMode = window.matchMedia("(hover: none)");
 
-  const stage = container.closest(".hero-product-stage") || container;
-  const exploreRoot = container.closest("[data-hero-interactive]");
+  const section = container.closest(".in-motion") || container.parentElement;
+  const stage = section?.querySelector(".hero-product-stage") || container;
+  const exploreRoot = section?.querySelector("[data-hero-interactive]") || container.closest("[data-hero-interactive]");
 
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: true,
+      alpha: false,
       powerPreference: "high-performance"
     });
   } catch {
@@ -87,57 +125,100 @@ export function initHeroOrbit3d(container, options = {}) {
     return null;
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setClearColor(0x000000, 0);
+  renderer.setClearColor(PAGE_BG, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  // Match gltf.report / Khronos product viewing — not ACES, which blows out transmission.
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1;
   container.appendChild(renderer.domElement);
   renderer.domElement.className = "hero-orbit-canvas";
   renderer.domElement.setAttribute("aria-hidden", "true");
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x0a0a0a, 0.1);
+  // Color background is what transmission samples reliably; grid plane matches CSS style.
+  scene.background = new THREE.Color(PAGE_BG);
+
+  const PAGE_BACKDROP_DIST = 14;
+  const pageBgCanvas = document.createElement("canvas");
+  const pageBgTexture = new THREE.CanvasTexture(pageBgCanvas);
+  pageBgTexture.colorSpace = THREE.SRGBColorSpace;
+  pageBgTexture.wrapS = THREE.RepeatWrapping;
+  pageBgTexture.wrapT = THREE.RepeatWrapping;
+  pageBgTexture.magFilter = THREE.LinearFilter;
+  pageBgTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  paintPageBackground(pageBgCanvas);
+  pageBgTexture.needsUpdate = true;
+
+  const pageBackdrop = new THREE.Mesh(
+    new THREE.PlaneGeometry(1, 1),
+    new THREE.MeshBasicMaterial({
+      map: pageBgTexture,
+      depthTest: true,
+      depthWrite: true,
+      toneMapped: false
+    })
+  );
+  pageBackdrop.frustumCulled = false;
+  pageBackdrop.renderOrder = -1000;
+  scene.add(pageBackdrop);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
-  const envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environment = envTexture;
+  let envTexture = null;
 
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
-  camera.position.set(0, 0.28, 5);
+  async function loadEnvironment() {
+    const hdr = await new RGBELoader().loadAsync(ENV_URL);
+    hdr.mapping = THREE.EquirectangularReflectionMapping;
+    envTexture = pmrem.fromEquirectangular(hdr).texture;
+    hdr.dispose();
+    scene.environment = envTexture;
+  }
+
+  const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 40);
+  camera.position.set(0, 0.22, 6.1);
   camera.lookAt(0, 0, 0);
 
   const root = new THREE.Group();
   scene.add(root);
 
-  const keyLight = new THREE.DirectionalLight(0xfff4d6, 1.15);
-  keyLight.position.set(2.4, 3.8, 4.2);
-  scene.add(keyLight);
+  let pageBgSyncKey = "";
+  function syncPageBackground() {
+    const rect = renderer.domElement.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
 
-  const rimLight = new THREE.DirectionalLight(0xe8ff3a, 0.5);
-  rimLight.position.set(-3.2, 1.4, -2.4);
-  scene.add(rimLight);
+    const stageRect = stage.getBoundingClientRect();
+    const key = `${Math.round(rect.left)}:${Math.round(rect.top)}:${Math.round(rect.width)}:${Math.round(rect.height)}:${Math.round(stageRect.left)}:${Math.round(stageRect.top)}:${Math.round(stageRect.width)}:${camera.aspect.toFixed(3)}`;
+    if (key === pageBgSyncKey) return;
+    pageBgSyncKey = key;
 
-  const fillLight = new THREE.PointLight(0x88bbff, 0.3, 12);
-  fillLight.position.set(-1.8, -0.6, 2.4);
-  scene.add(fillLight);
+    paintPageBackground(pageBgCanvas);
+    pageBgTexture.needsUpdate = true;
 
-  const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(8, 8),
-    new THREE.MeshBasicMaterial({
-      color: 0x0a0a0a,
-      transparent: true,
-      opacity: 0.55
-    })
-  );
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -1.5;
-  scene.add(floor);
+    // Keep the bottle on the optical axis (no root offset) — off-center placement
+    // was keystoning the jar. Shift the frustum instead so it sits over the stage.
+    if (stageRect.width) {
+      const stageCx =
+        (stageRect.left + stageRect.width / 2 - rect.left) / rect.width;
+      const stageCy =
+        (stageRect.top + stageRect.height / 2 - rect.top) / rect.height;
+      const offsetX = (0.5 - stageCx) * rect.width;
+      const offsetY = (0.5 - stageCy) * rect.height;
+      camera.setViewOffset(rect.width, rect.height, offsetX, offsetY, rect.width, rect.height);
+    } else {
+      camera.clearViewOffset();
+    }
+    camera.updateProjectionMatrix();
 
-  const grid = new THREE.GridHelper(6, 24, 0xe8ff3a, 0x2a2a2a);
-  grid.position.y = -1.49;
-  grid.material.transparent = true;
-  grid.material.opacity = 0.22;
-  scene.add(grid);
+    // Oversized so the shifted frustum never shows past the backdrop edges.
+    const height =
+      2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * PAGE_BACKDROP_DIST * 1.75;
+    const width = height * camera.aspect;
+    pageBackdrop.scale.set(width, height, 1);
+    // One continuous grid; cell count scales gently with plane size.
+    pageBgTexture.repeat.set(Math.max(6, width * 0.22), Math.max(6, height * 0.22));
+    pageBackdrop.position.copy(camera.position);
+    pageBackdrop.quaternion.copy(camera.quaternion);
+    pageBackdrop.translateZ(-PAGE_BACKDROP_DIST);
+  }
 
   const orbitRing = new THREE.Mesh(
     new THREE.TorusGeometry(ORBIT_RADIUS, 0.008, 12, 120),
@@ -156,20 +237,6 @@ export function initHeroOrbit3d(container, options = {}) {
   const bottleGroup = new THREE.Group();
   turntable.add(bottleGroup);
   turntable.add(orbitRing);
-
-  const aura = new THREE.Mesh(
-    new THREE.CircleGeometry(1.05, 48),
-    new THREE.MeshBasicMaterial({
-      color: 0xe8ff3a,
-      transparent: true,
-      opacity: 0.08,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending
-    })
-  );
-  aura.rotation.x = -Math.PI / 2;
-  aura.position.y = -1.45;
-  root.add(aura);
 
   const orbitPivot = new THREE.Group();
   orbitPivot.rotation.x = 0.42;
@@ -198,7 +265,6 @@ export function initHeroOrbit3d(container, options = {}) {
 
   function setExploring(next) {
     isExploring = next;
-    aura.material.opacity = next ? 0.14 : 0.08;
   }
 
   function setFocusedIngredient(key) {
@@ -214,8 +280,11 @@ export function initHeroOrbit3d(container, options = {}) {
     const height = container.clientHeight;
     if (!width || !height) return;
     camera.aspect = width / height;
+    // View offset is reapplied in syncPageBackground after setSize.
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
+    pageBgSyncKey = "";
+    syncPageBackground();
   }
 
   function updatePointer(event) {
@@ -254,10 +323,10 @@ export function initHeroOrbit3d(container, options = {}) {
 
   function syncHoverCursor(key) {
     if (isDragging) {
-      renderer.domElement.style.cursor = "grabbing";
+      stage.style.cursor = "grabbing";
       return;
     }
-    renderer.domElement.style.cursor = key ? "pointer" : "grab";
+    stage.style.cursor = key ? "pointer" : "grab";
   }
 
   function handlePointerDown(event) {
@@ -269,7 +338,7 @@ export function initHeroOrbit3d(container, options = {}) {
     dragMoved = false;
     isDragging = false;
     dragVelocity = 0;
-    renderer.domElement.setPointerCapture?.(event.pointerId);
+    stage.setPointerCapture?.(event.pointerId);
   }
 
   function handlePointerMove(event) {
@@ -311,7 +380,7 @@ export function initHeroOrbit3d(container, options = {}) {
     const wasDrag = dragMoved;
     isDragging = false;
     activePointerId = null;
-    renderer.domElement.releasePointerCapture?.(event.pointerId);
+    stage.releasePointerCapture?.(event.pointerId);
 
     if (!wasDrag) {
       selectIngredient(pickIngredient());
@@ -330,6 +399,8 @@ export function initHeroOrbit3d(container, options = {}) {
   function animate(timeMs) {
     animationId = requestAnimationFrame(animate);
     if (!isVisible) return;
+
+    syncPageBackground();
 
     const time = timeMs * 0.001;
 
@@ -350,7 +421,6 @@ export function initHeroOrbit3d(container, options = {}) {
     }
 
     turntable.rotation.y = turntableYaw;
-    aura.scale.setScalar(1 + Math.sin(time * 1.4) * 0.04);
 
     ingredientMeshes.forEach((entry) => {
       const reveal = entry.group.userData.targetOpacity ?? 1;
@@ -399,21 +469,32 @@ export function initHeroOrbit3d(container, options = {}) {
     const gltf = await new GLTFLoader().loadAsync(MODEL_URL);
     const model = gltf.scene;
 
+    // Only strip physics-sim leftovers; materials/textures stay as exported.
     [...model.children].forEach((node) => {
       if (node.name.startsWith("Gummy") && node.position.y > STRAY_GUMMY_MIN_Y) {
         model.remove(node);
       }
     });
 
-    const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+    // Bottle mesh has two shells (inner + outer), both transmission:1. Rendering
+    // both washes the jar milky; hide the inner mesh entirely. Thin the outer wall
+    // so transmission stays clear without lens-warping the gummies / grid.
     model.traverse((obj) => {
       if (!obj.isMesh || !obj.material) return;
       const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+      if (materials.every((material) => material.name === "inner")) {
+        obj.visible = false;
+        return;
+      }
       materials.forEach((material) => {
-        if (material.map) {
-          material.map.anisotropy = maxAnisotropy;
-          material.map.needsUpdate = true;
+        if (material.name === "inner") {
+          material.visible = false;
+          return;
         }
+        if (!(material.transmission > 0)) return;
+        material.thickness = 0.04;
+        material.ior = 1.4;
+        material.needsUpdate = true;
       });
     });
 
@@ -424,6 +505,7 @@ export function initHeroOrbit3d(container, options = {}) {
     model.scale.setScalar(scale);
     model.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
     bottleGroup.add(model);
+    await renderer.compileAsync(model, camera, scene);
   }
 
   async function buildOrbs() {
@@ -600,20 +682,24 @@ export function initHeroOrbit3d(container, options = {}) {
     });
   }
 
-  Promise.all([buildModel(), buildOrbs()])
+  Promise.all([loadEnvironment(), buildModel(), buildOrbs()])
     .then(() => {
       resize();
       stage.classList.add("has-3d");
+      section?.classList.add("has-webgl-bg");
       animate(0);
     })
     .catch((err) => {
       console.error("[hero-orbit-3d]", err);
       stage.classList.remove("has-3d");
+      section?.classList.remove("has-webgl-bg");
       container.classList.add("hero-orbit-3d--failed");
     });
 
   resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(container);
+  if (section && section !== container) resizeObserver.observe(section);
+  if (stage !== container) resizeObserver.observe(stage);
 
   visibilityObserver = new IntersectionObserver(
     ([entry]) => {
@@ -634,13 +720,13 @@ export function initHeroOrbit3d(container, options = {}) {
     syncExplore();
   }
 
-  renderer.domElement.style.cursor = "grab";
-  renderer.domElement.style.touchAction = "none";
-  renderer.domElement.addEventListener("pointerdown", handlePointerDown);
-  renderer.domElement.addEventListener("pointermove", handlePointerMove);
-  renderer.domElement.addEventListener("pointerup", handlePointerUp);
-  renderer.domElement.addEventListener("pointercancel", handlePointerUp);
-  renderer.domElement.addEventListener("pointerleave", handlePointerLeave);
+  stage.style.cursor = "grab";
+  stage.style.touchAction = "none";
+  stage.addEventListener("pointerdown", handlePointerDown);
+  stage.addEventListener("pointermove", handlePointerMove);
+  stage.addEventListener("pointerup", handlePointerUp);
+  stage.addEventListener("pointercancel", handlePointerUp);
+  stage.addEventListener("pointerleave", handlePointerLeave);
 
   return {
     destroy() {
@@ -648,15 +734,19 @@ export function initHeroOrbit3d(container, options = {}) {
       resizeObserver?.disconnect();
       visibilityObserver?.disconnect();
       exploreObserver?.disconnect();
-      renderer.domElement.removeEventListener("pointerdown", handlePointerDown);
-      renderer.domElement.removeEventListener("pointermove", handlePointerMove);
-      renderer.domElement.removeEventListener("pointerup", handlePointerUp);
-      renderer.domElement.removeEventListener("pointercancel", handlePointerUp);
-      renderer.domElement.removeEventListener("pointerleave", handlePointerLeave);
-      envTexture.dispose();
+      stage.removeEventListener("pointerdown", handlePointerDown);
+      stage.removeEventListener("pointermove", handlePointerMove);
+      stage.removeEventListener("pointerup", handlePointerUp);
+      stage.removeEventListener("pointercancel", handlePointerUp);
+      stage.removeEventListener("pointerleave", handlePointerLeave);
+      envTexture?.dispose();
+      pageBgTexture.dispose();
+      pageBackdrop.geometry.dispose();
+      pageBackdrop.material.dispose();
       pmrem.dispose();
       renderer.dispose();
       stage.classList.remove("has-3d");
+      section?.classList.remove("has-webgl-bg");
     },
     setExploring,
     clearSelection() {

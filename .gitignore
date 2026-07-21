@@ -1,2 +1,29 @@
 /invoice-worklog-draft.md
 .cursor/rules/invoice-worklog.mdc
+
+# Dependencies — install locally with npm if needed; do not commit
+node_modules/
+
+# Blender / Photoshop sources (keep local; web uses exported GLB/PNG)
+*.blend
+*.blend1
+*.psd
+
+# Local working copies / refs not loaded by the site
+assets/3D resources/*backup*
+assets/3D resources/*-view.png
+assets/3D resources/*-front.png
+assets/3D resources/*-back.png
+assets/3D resources/*-side.png
+assets/3D resources/*-pre-*
+assets/3D resources/hydroboost-v1.glb
+assets/3D resources/hydroboost-pre-colorfix.glb
+assets/3D resources/golden-lemon-lime-gummy-seamless-basecolor.png
+assets/3D resources/cordycep.png
+assets/3D resources/flat-front-view.png
+assets/3D resources/super-flat-front-view.png
+assets/3D resources/relax_inn_seaview_suite_4k.exr
+assets/3D resources/K.png
+assets/3D resources/Mg.png
+assets/3D resources/Na.png
+assets/3D resources/hydro_boost_wrap_label*.png
