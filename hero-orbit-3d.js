@@ -47,6 +47,11 @@ const INGREDIENT_MODELS = {
   potassium: "K.glb"
 };
 
+// Smaller GLBs first so light orbs appear while the heavy electrolytes download.
+const ORB_LOAD_PRIORITY = ["cordyceps", "maca", "magnesium", "sodium", "potassium"];
+const ORB_LOAD_CONCURRENCY = 2;
+const ORB_LOAD_VIEWPORT_MARGIN = "400px 0px";
+
 function loadTexture(url) {
   return new Promise((resolve, reject) => {
     new THREE.TextureLoader().load(url, resolve, undefined, reject);
@@ -283,6 +288,8 @@ export function initHeroOrbit3d(container, options = {}) {
   let resizeObserver = null;
   let exploreObserver = null;
   let visibilityObserver = null;
+  let orbLoadObserver = null;
+  let orbsStarted = false;
 
   function shortestAngleDelta(from, to) {
     return Math.atan2(Math.sin(to - from), Math.cos(to - from));
@@ -620,187 +627,215 @@ export function initHeroOrbit3d(container, options = {}) {
     await renderer.compileAsync(model, camera, scene);
   }
 
-  async function buildOrbs() {
-    const loader = new GLTFLoader();
-    const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+  async function loadIngredientSource(loader, button, maxAnisotropy) {
+    const key = button.dataset.ingredientKey;
+    const name = button.dataset.name || "";
+    const modelFile = INGREDIENT_MODELS[key];
+    let model = null;
 
-    const ingredientSources = await Promise.all(
-      ingredientButtons.map(async (button) => {
-        const key = button.dataset.ingredientKey;
-        const name = button.dataset.name || "";
-        const modelFile = INGREDIENT_MODELS[key];
-        let model = null;
+    if (modelFile) {
+      try {
+        const gltf = await loader.loadAsync(`${ASSET_BASE}${encodeURIComponent(modelFile)}`);
+        model = gltf.scene;
+        model.traverse((obj) => {
+          if (!obj.isMesh || !obj.material) return;
+          const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+          materials.forEach((material) => {
+            if (material.map) {
+              material.map.anisotropy = maxAnisotropy;
+              material.map.needsUpdate = true;
+            }
+            material.transparent = true;
+            material.opacity = 0;
+          });
+        });
+        model.userData.opacity = 0;
+      } catch (err) {
+        console.warn(`[hero-orbit-3d] failed to load ${modelFile}`, err);
+      }
+    }
 
-        if (modelFile) {
-          try {
-            const gltf = await loader.loadAsync(`${ASSET_BASE}${encodeURIComponent(modelFile)}`);
-            model = gltf.scene;
-            model.traverse((obj) => {
-              if (!obj.isMesh || !obj.material) return;
-              const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
-              materials.forEach((material) => {
-                if (material.map) {
-                  material.map.anisotropy = maxAnisotropy;
-                  material.map.needsUpdate = true;
-                }
-                material.transparent = true;
-                material.opacity = 0;
-              });
-            });
-            model.userData.opacity = 0;
-          } catch (err) {
-            console.warn(`[hero-orbit-3d] failed to load ${modelFile}`, err);
-          }
-        }
+    let texture = null;
+    if (!model) {
+      const image = button.querySelector("img");
+      const src = image?.getAttribute("src") || "";
+      if (src) {
+        texture = await loadTexture(src);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = maxAnisotropy;
+      }
+    }
 
-        let texture = null;
-        if (!model) {
-          const image = button.querySelector("img");
-          const src = image?.getAttribute("src") || "";
-          if (src) {
-            texture = await loadTexture(src);
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.anisotropy = maxAnisotropy;
-          }
-        }
+    return { key, name, model, texture };
+  }
 
-        return { key, name, model, texture };
+  function mountOrb(source, revealIndex) {
+    const group = new THREE.Group();
+    group.userData.targetOpacity = 1;
+    group.userData.revealDelay = revealIndex * 0.08;
+    group.userData.ingredientKey = source.key;
+
+    const hit = new THREE.Mesh(
+      new THREE.SphereGeometry(ORB_HIT_RADIUS, 16, 16),
+      new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+        depthWrite: false
       })
     );
+    hit.userData.ingredientKey = source.key;
 
-    // Place ingredients in DOM/order mapping, but force equal orbit intervals.
-    const orderedSources = INGREDIENT_ORDER.map((key, index) => {
-      const source = ingredientSources.find((item) => item.key === key)
-        || ingredientSources[index]
-        || { key, name: key, model: null, texture: null };
-      return {
-        ...source,
-        angle: -Math.PI / 2 + (index / INGREDIENT_ORDER.length) * Math.PI * 2
-      };
-    });
+    const shell = new THREE.Mesh(
+      new THREE.SphereGeometry(ORB_SHELL_RADIUS, 32, 32),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0,
+        roughness: 0.04,
+        metalness: 0,
+        transmission: 0.92,
+        thickness: 0.35,
+        ior: 1.2,
+        clearcoat: 1,
+        clearcoatRoughness: 0.08,
+        depthWrite: false
+      })
+    );
+    shell.userData.ingredientKey = source.key;
 
-    orderedSources.forEach((source, index) => {
-      const group = new THREE.Group();
-      group.userData.targetOpacity = 1;
-      group.userData.revealDelay = index * 0.08;
-      group.userData.ingredientKey = source.key;
+    let core = null;
+    let modelRoot = null;
 
-      const hit = new THREE.Mesh(
-        new THREE.SphereGeometry(ORB_HIT_RADIUS, 16, 16),
-        new THREE.MeshBasicMaterial({
-          transparent: true,
-          opacity: 0,
-          depthWrite: false
-        })
-      );
-      hit.userData.ingredientKey = source.key;
-
-      const shell = new THREE.Mesh(
-        new THREE.SphereGeometry(ORB_SHELL_RADIUS, 32, 32),
-        new THREE.MeshPhysicalMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0,
-          roughness: 0.04,
-          metalness: 0,
-          transmission: 0.92,
-          thickness: 0.35,
-          ior: 1.2,
-          clearcoat: 1,
-          clearcoatRoughness: 0.08,
-          depthWrite: false
-        })
-      );
-      shell.userData.ingredientKey = source.key;
-
-      let core = null;
-      let modelRoot = null;
-
-      if (source.model) {
-        modelRoot = new THREE.Group();
-        modelRoot.userData.ingredientKey = source.key;
-        const fitted = source.model;
-        fitObjectToSize(fitted, ORB_MODEL_SIZE);
-        fitted.traverse((obj) => {
-          obj.userData.ingredientKey = source.key;
-        });
-        modelRoot.add(fitted);
-        group.add(modelRoot);
-      } else {
-        core = new THREE.Mesh(
-          new THREE.SphereGeometry(0.14, 24, 24),
-          new THREE.MeshStandardMaterial({
-            color: 0xffffff,
-            map: source.texture,
-            transparent: true,
-            opacity: 0,
-            roughness: 0.85,
-            metalness: 0
-          })
-        );
-        core.userData.ingredientKey = source.key;
-        group.add(core);
-      }
-
-      const labelCanvas = document.createElement("canvas");
-      labelCanvas.width = 512;
-      labelCanvas.height = 128;
-      const ctx = labelCanvas.getContext("2d");
-      ctx.fillStyle = "rgba(8,8,8,0.82)";
-      ctx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
-      ctx.strokeStyle = "rgba(232,255,58,0.45)";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(8, 8, labelCanvas.width - 16, labelCanvas.height - 16);
-      ctx.fillStyle = "#e8ff3a";
-      ctx.font = "bold 44px Barlow, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText((source.name || "").toUpperCase(), labelCanvas.width / 2, labelCanvas.height / 2);
-
-      const labelTexture = new THREE.CanvasTexture(labelCanvas);
-      labelTexture.colorSpace = THREE.SRGBColorSpace;
-      const label = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.62, 0.16),
-        new THREE.MeshBasicMaterial({
-          map: labelTexture,
-          transparent: true,
-          opacity: 0,
-          depthWrite: false
-        })
-      );
-      label.position.y = -0.38;
-      label.userData.ingredientKey = source.key;
-
-      group.add(hit, shell, label);
-
-      // Center of each orb sits on the shared orbit ring (local XZ in orbitPivot).
-      group.position.set(
-        Math.cos(source.angle) * ORBIT_RADIUS,
-        0,
-        Math.sin(source.angle) * ORBIT_RADIUS
-      );
-      group.lookAt(0, 0, 0);
-
-      orbitPivot.add(group);
-      ingredientMeshes.push({
-        key: source.key,
-        group,
-        hit,
-        shell,
-        core,
-        modelRoot,
-        label,
-        phase: source.angle
+    if (source.model) {
+      modelRoot = new THREE.Group();
+      modelRoot.userData.ingredientKey = source.key;
+      const fitted = source.model;
+      fitObjectToSize(fitted, ORB_MODEL_SIZE);
+      fitted.traverse((obj) => {
+        obj.userData.ingredientKey = source.key;
       });
+      modelRoot.add(fitted);
+      group.add(modelRoot);
+    } else {
+      core = new THREE.Mesh(
+        new THREE.SphereGeometry(0.14, 24, 24),
+        new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          map: source.texture,
+          transparent: true,
+          opacity: 0,
+          roughness: 0.85,
+          metalness: 0
+        })
+      );
+      core.userData.ingredientKey = source.key;
+      group.add(core);
+    }
+
+    const labelCanvas = document.createElement("canvas");
+    labelCanvas.width = 512;
+    labelCanvas.height = 128;
+    const ctx = labelCanvas.getContext("2d");
+    ctx.fillStyle = "rgba(8,8,8,0.82)";
+    ctx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
+    ctx.strokeStyle = "rgba(232,255,58,0.45)";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(8, 8, labelCanvas.width - 16, labelCanvas.height - 16);
+    ctx.fillStyle = "#e8ff3a";
+    ctx.font = "bold 44px Barlow, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText((source.name || "").toUpperCase(), labelCanvas.width / 2, labelCanvas.height / 2);
+
+    const labelTexture = new THREE.CanvasTexture(labelCanvas);
+    labelTexture.colorSpace = THREE.SRGBColorSpace;
+    const label = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.62, 0.16),
+      new THREE.MeshBasicMaterial({
+        map: labelTexture,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false
+      })
+    );
+    label.position.y = -0.38;
+    label.userData.ingredientKey = source.key;
+
+    group.add(hit, shell, label);
+
+    // Center of each orb sits on the shared orbit ring (local XZ in orbitPivot).
+    group.position.set(
+      Math.cos(source.angle) * ORBIT_RADIUS,
+      0,
+      Math.sin(source.angle) * ORBIT_RADIUS
+    );
+    group.lookAt(0, 0, 0);
+
+    orbitPivot.add(group);
+    ingredientMeshes.push({
+      key: source.key,
+      group,
+      hit,
+      shell,
+      core,
+      modelRoot,
+      label,
+      phase: source.angle
     });
   }
 
-  Promise.all([loadEnvironment(), buildModel(), buildOrbs()])
+  async function buildOrbs() {
+    const loader = new GLTFLoader();
+    const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+    const buttonByKey = new Map(
+      ingredientButtons.map((button) => [button.dataset.ingredientKey, button])
+    );
+
+    const orbJobs = INGREDIENT_ORDER.map((key, index) => ({
+      key,
+      index,
+      angle: -Math.PI / 2 + (index / INGREDIENT_ORDER.length) * Math.PI * 2
+    })).sort(
+      (a, b) => ORB_LOAD_PRIORITY.indexOf(a.key) - ORB_LOAD_PRIORITY.indexOf(b.key)
+    );
+
+    let cursor = 0;
+
+    async function loadNextOrb() {
+      while (cursor < orbJobs.length) {
+        const job = orbJobs[cursor++];
+        const button = buttonByKey.get(job.key);
+        if (!button) continue;
+
+        try {
+          const source = await loadIngredientSource(loader, button, maxAnisotropy);
+          mountOrb({ ...source, angle: job.angle }, job.index);
+        } catch (err) {
+          const modelFile = INGREDIENT_MODELS[job.key];
+          console.warn(`[hero-orbit-3d] failed to load ${modelFile || job.key}`, err);
+        }
+      }
+    }
+
+    const workers = Math.min(ORB_LOAD_CONCURRENCY, orbJobs.length);
+    await Promise.all(Array.from({ length: workers }, () => loadNextOrb()));
+  }
+
+  function startOrbLoading() {
+    if (orbsStarted) return;
+    orbsStarted = true;
+    buildOrbs().catch((err) => {
+      console.warn("[hero-orbit-3d] orb loading error", err);
+    });
+  }
+
+  resize();
+  animate(0);
+
+  Promise.all([loadEnvironment(), buildModel()])
     .then(() => {
-      resize();
       stage.classList.add("has-3d");
       section?.classList.add("has-webgl-bg");
-      animate(0);
     })
     .catch((err) => {
       console.error("[hero-orbit-3d]", err);
@@ -808,6 +843,17 @@ export function initHeroOrbit3d(container, options = {}) {
       section?.classList.remove("has-webgl-bg");
       container.classList.add("hero-orbit-3d--failed");
     });
+
+  orbLoadObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting) return;
+      startOrbLoading();
+      orbLoadObserver?.disconnect();
+      orbLoadObserver = null;
+    },
+    { rootMargin: ORB_LOAD_VIEWPORT_MARGIN, threshold: 0 }
+  );
+  orbLoadObserver.observe(container);
 
   resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(container);
@@ -846,6 +892,7 @@ export function initHeroOrbit3d(container, options = {}) {
       cancelAnimationFrame(animationId);
       resizeObserver?.disconnect();
       visibilityObserver?.disconnect();
+      orbLoadObserver?.disconnect();
       exploreObserver?.disconnect();
       stage.removeEventListener("pointerdown", handlePointerDown);
       stage.removeEventListener("pointermove", handlePointerMove);
