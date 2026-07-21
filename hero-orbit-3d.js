@@ -2,8 +2,9 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
-const MODEL_URL = "assets/3D%20resources/hydroboost.glb?v=gummies30-20260720-1817";
+const MODEL_URL = "assets/3D%20resources/optimized-models/hydroboost-optimized.glb";
 const ASSET_BASE = "assets/3D%20resources/";
+const ASSET_BASE_OPT = "assets/3D%20resources/optimized-models/";
 const ENV_URL = "assets/hdri/artist_workshop_1k.hdr";
 // Full-bleed in-motion section backdrop (dark green + grid), replaces CSS.
 const PAGE_BG_HEX = "#0b1209";
@@ -39,17 +40,38 @@ const INGREDIENT_ORDER = [
   "potassium"
 ];
 
+// Entries with an optimized build use the smaller file; originals fall back to ASSET_BASE.
 const INGREDIENT_MODELS = {
-  maca: "black-maca.glb",
-  cordyceps: "cordycep.glb",
-  magnesium: "Mg.glb",
-  sodium: "Na.glb",
-  potassium: "K.glb"
+  maca:      { file: "black-maca.glb",      base: ASSET_BASE },
+  cordyceps: { file: "cordycep.glb",         base: ASSET_BASE },
+  magnesium: { file: "Mg-optimized.glb",     base: ASSET_BASE_OPT },
+  sodium:    { file: "Na-optimized.glb",     base: ASSET_BASE_OPT },
+  potassium: { file: "K-optimized.glb",      base: ASSET_BASE_OPT },
 };
 
 // Smaller GLBs first so light orbs appear while the heavy electrolytes download.
 const ORB_LOAD_PRIORITY = ["cordyceps", "maca", "magnesium", "sodium", "potassium"];
 const ORB_LOAD_CONCURRENCY = 2;
+
+function addFetchHint(rel, href) {
+  const escaped = href.replace(/"/g, '\\"');
+  if (document.querySelector(`link[rel="${rel}"][href="${escaped}"]`)) return;
+  const link = document.createElement("link");
+  link.rel = rel;
+  link.href = href;
+  link.as = "fetch";
+  link.crossOrigin = "";
+  document.head.appendChild(link);
+}
+
+function warmOrbitAssets() {
+  addFetchHint("preload", MODEL_URL);
+  addFetchHint("preload", ENV_URL);
+  ORB_LOAD_PRIORITY.forEach((key) => {
+    const entry = INGREDIENT_MODELS[key];
+    if (entry) addFetchHint("prefetch", entry.base + entry.file);
+  });
+}
 
 function loadTexture(url) {
   return new Promise((resolve, reject) => {
@@ -118,6 +140,7 @@ function paintPageBackground(canvas) {
 }
 
 export function initHeroOrbit3d(container, options = {}) {
+  warmOrbitAssets();
   if (!container || prefersReducedMotion()) return null;
 
   const ingredientButtons = options.ingredients || [];
@@ -628,12 +651,14 @@ export function initHeroOrbit3d(container, options = {}) {
   async function loadIngredientSource(loader, button, maxAnisotropy) {
     const key = button.dataset.ingredientKey;
     const name = button.dataset.name || "";
-    const modelFile = INGREDIENT_MODELS[key];
+    const modelEntry = INGREDIENT_MODELS[key];
+    const modelFile = modelEntry?.file;
+    const modelBase = modelEntry?.base ?? ASSET_BASE;
     let model = null;
 
     if (modelFile) {
       try {
-        const gltf = await loader.loadAsync(`${ASSET_BASE}${encodeURIComponent(modelFile)}`);
+        const gltf = await loader.loadAsync(`${modelBase}${encodeURIComponent(modelFile)}`);
         model = gltf.scene;
         model.traverse((obj) => {
           if (!obj.isMesh || !obj.material) return;
@@ -809,7 +834,7 @@ export function initHeroOrbit3d(container, options = {}) {
           const source = await loadIngredientSource(loader, button, maxAnisotropy);
           mountOrb({ ...source, angle: job.angle }, job.index);
         } catch (err) {
-          const modelFile = INGREDIENT_MODELS[job.key];
+          const modelFile = INGREDIENT_MODELS[job.key]?.file;
           console.warn(`[hero-orbit-3d] failed to load ${modelFile || job.key}`, err);
         }
       }
@@ -918,19 +943,13 @@ export function initHeroOrbit3d(container, options = {}) {
   };
 }
 
-function autoInit() {
-  const container = document.querySelector("[data-hero-orbit]");
-  if (!container) return;
+export function bootHeroOrbit3d(container = document.querySelector("[data-hero-orbit]")) {
+  if (!container || window.__heroOrbit) return window.__heroOrbit;
   const bridge = window.__heroOrbitBridge || {};
   window.__heroOrbit = initHeroOrbit3d(container, {
     ingredients: bridge.ingredients || Array.from(document.querySelectorAll(".hero-ingredient")),
     onIngredientFocus: bridge.focus,
     onIngredientBlur: bridge.blur
   });
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", autoInit, { once: true });
-} else {
-  autoInit();
+  return window.__heroOrbit;
 }
