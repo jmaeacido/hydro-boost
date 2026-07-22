@@ -1,4 +1,5 @@
-/invoice-worklog-draft.md
+**/invoice-worklog-draft.md
+**/invoice-worklog-rules.md
 .cursor/rules/invoice-worklog.mdc
 
 # Dependencies — install locally with npm if needed; do not commit
