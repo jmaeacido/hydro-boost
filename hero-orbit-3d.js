@@ -293,6 +293,26 @@ export function initHeroOrbit3d(container, options = {}) {
   let exploreObserver = null;
   let visibilityObserver = null;
 
+  function syncResponsiveCanvasBounds() {
+    const bindToStage = window.matchMedia("(max-width: 980px)").matches;
+    container.classList.toggle("is-stage-bound", bindToStage);
+
+    if (!bindToStage || !section || stage === container) {
+      container.style.removeProperty("--orbit-left");
+      container.style.removeProperty("--orbit-top");
+      container.style.removeProperty("--orbit-width");
+      container.style.removeProperty("--orbit-height");
+      return;
+    }
+
+    const sectionRect = section.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    container.style.setProperty("--orbit-left", `${stageRect.left - sectionRect.left}px`);
+    container.style.setProperty("--orbit-top", `${stageRect.top - sectionRect.top}px`);
+    container.style.setProperty("--orbit-width", `${stageRect.width}px`);
+    container.style.setProperty("--orbit-height", `${stageRect.height}px`);
+  }
+
   function shortestAngleDelta(from, to) {
     return Math.atan2(Math.sin(to - from), Math.cos(to - from));
   }
@@ -327,6 +347,7 @@ export function initHeroOrbit3d(container, options = {}) {
   }
 
   function resize() {
+    syncResponsiveCanvasBounds();
     const width = container.clientWidth;
     const height = container.clientHeight;
     if (!width || !height) return;
@@ -843,7 +864,9 @@ export function initHeroOrbit3d(container, options = {}) {
   }
 
   stage.style.cursor = "grab";
-  stage.style.touchAction = "none";
+  // Preserve vertical page scrolling on touch screens; horizontal gestures still
+  // reach the orbit controls and rotate the model.
+  stage.style.touchAction = touchMode.matches ? "pan-y" : "none";
   stage.addEventListener("pointerdown", handlePointerDown);
   stage.addEventListener("pointermove", handlePointerMove);
   stage.addEventListener("pointerup", handlePointerUp);

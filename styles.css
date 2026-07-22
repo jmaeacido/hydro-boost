@@ -2475,6 +2475,24 @@ select {
     padding-top: clamp(56px, 8svh, 72px);
     padding-bottom: clamp(56px, 8svh, 72px);
   }
+  .in-motion-orbit.is-stage-bound {
+    top: var(--orbit-top);
+    left: var(--orbit-left);
+    right: auto;
+    bottom: auto;
+    width: var(--orbit-width);
+    height: var(--orbit-height);
+    overflow: visible;
+  }
+  .in-motion.has-webgl-bg,
+  .in-motion.has-webgl-bg.slice-alt {
+    background:
+      linear-gradient(rgba(232, 255, 58, .035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232, 255, 58, .025) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(232, 255, 58, .05) 0%, transparent 42%),
+      #0b1209;
+    background-size: 48px 48px, 48px 48px, auto, auto;
+  }
   .in-motion-grid {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -2605,9 +2623,24 @@ select {
   .hero-formula-copy { font-size: .88rem; }
   .hero-formula-study { font-size: .62rem; }
   .in-motion .hero-product {
-    width: min(92vw, 360px);
-    margin-top: 28px;
+    width: min(calc(100vw - 24px), 380px);
+    margin-top: 18px;
   }
+  .in-motion {
+    padding-top: 40px;
+    padding-bottom: 44px;
+  }
+  .in-motion-grid { gap: 18px; }
+  .in-motion .hero-formula-panel {
+    width: 100%;
+    padding: 16px;
+  }
+  .in-motion .hero-formula-eyebrow {
+    margin-bottom: 8px;
+    font-size: clamp(1.15rem, 7.2vw, 1.65rem);
+  }
+  .in-motion .hero-formula-copy { line-height: 1.42; }
+  .hero-product-stage.has-3d { touch-action: pan-y; }
   .hero-ingredients { inset: 4% -4% 0; }
   .hero-ingredient {
     width: clamp(62px, 17vw, 84px);
@@ -2724,6 +2757,17 @@ select {
 }
 
 @media (max-width: 400px) {
+  .section { padding-inline: 12px; }
+  .in-motion .hero-product {
+    width: min(calc(100vw - 16px), 350px);
+    margin-top: 12px;
+  }
+  .in-motion .hero-formula-panel { padding: 14px; }
+  .hero-ingredient-hint {
+    max-width: 28ch;
+    margin-inline: auto;
+    line-height: 1.45;
+  }
   .situation-grid,
   .benefit-grid,
   .ingredient-grid {
