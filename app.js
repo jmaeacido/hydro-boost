@@ -62,7 +62,9 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 
 revealItems.forEach((item, index) => {
-  item.style.transitionDelay = `${Math.min(index % 6, 5) * 40}ms`;
+  if (!item.classList.contains("situation")) {
+    item.style.transitionDelay = `${Math.min(index % 6, 5) * 40}ms`;
+  }
   revealObserver.observe(item);
 });
 

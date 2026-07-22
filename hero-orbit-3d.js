@@ -3,7 +3,7 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
-const MODEL_URL = "assets/3D%20resources/optimized-models/hydroboost-optimized.glb";
+const MODEL_URL = "assets/3D%20resources/hydroboost-draco-compressed.glb";
 const ASSET_BASE = "assets/3D%20resources/";
 const ASSET_BASE_OPT = "assets/3D%20resources/optimized-models/";
 const ENV_URL = "assets/hdri/artist_workshop_1k.hdr";
