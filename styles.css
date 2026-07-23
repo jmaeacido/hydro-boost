@@ -264,6 +264,11 @@ button, .button, .cta-chip, .sticky-buy, .hero-ingredient, .meet-ingredient, .in
 }
 
 .hero .eyebrow {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  clip-path: none;
   font-family: var(--label-sans);
   font-weight: 600;
   letter-spacing: .28em;
@@ -790,12 +795,18 @@ button, .button, .cta-chip, .sticky-buy, .hero-ingredient, .meet-ingredient, .in
 }
 
 .eyebrow {
+  display: inline-block;
   margin: 0 0 14px;
+  padding: 6px 14px;
   color: var(--orange);
+  font-family: var(--label-sans);
   font-size: .72rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: .2em;
+  border: 1px solid rgba(255, 77, 0, .35);
+  background: rgba(255, 77, 0, .08);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
 }
 h1, h2, h3, p { margin-top: 0; }
 h1, h2 {
@@ -1132,12 +1143,7 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   flex: 0 0 auto;
 }
 .problem .section-head .eyebrow {
-  display: inline-block;
-  padding: 6px 14px;
   margin-bottom: clamp(10px, 1.5svh, 16px);
-  border: 1px solid rgba(255, 77, 0, .35);
-  background: rgba(255, 77, 0, .08);
-  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
 }
 .problem .section-head h2 {
   margin-bottom: clamp(8px, 1.5svh, 14px);
@@ -1621,9 +1627,10 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 
 .meet-ingredients {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-start;
-  gap: clamp(10px, 1.4vw, 14px);
+  align-items: flex-start;
+  gap: clamp(8px, 1.2vw, 14px);
   margin-top: clamp(14px, 2.4svh, 24px);
   padding: 22px 12px 18px;
   overflow: hidden;
@@ -1632,12 +1639,14 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 
 .meet-ingredient {
   display: grid;
+  grid-template-rows: auto auto;
   justify-items: center;
+  align-content: start;
   gap: 10px;
-  width: clamp(56px, 8svh, 92px);
+  width: clamp(72px, 9.5svh, 104px);
   flex: 0 0 auto;
   margin: 0;
-  padding: 6px 4px;
+  padding: 6px 2px;
   border: 0;
   background: transparent;
   color: inherit;
@@ -1647,7 +1656,9 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 
 .meet-ingredient-thumb {
   display: block;
-  width: 100%;
+  box-sizing: border-box;
+  width: clamp(52px, 7svh, 72px);
+  height: clamp(52px, 7svh, 72px);
   aspect-ratio: 1;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, .12);
@@ -1664,20 +1675,31 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   height: 100%;
   object-fit: cover;
   filter: grayscale(.35) saturate(.85);
-  transition: filter .35s ease;
+  transition: filter .35s ease, transform .35s ease;
+}
+
+/* Stock shots with extra padding — zoom to match full-bleed thumbs */
+.meet-ingredient[data-name="Black Maca"] .meet-ingredient-thumb img {
+  transform: scale(1.58);
+  object-position: 48% 55%;
+}
+.meet-ingredient[data-name="Sodium"] .meet-ingredient-thumb img {
+  transform: scale(1.48);
+  object-position: 38% 42%;
 }
 
 .meet-ingredient-label {
   font-family: var(--label-sans);
-  font-size: .62rem;
+  font-size: .58rem;
   font-weight: 700;
-  letter-spacing: .14em;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, .55);
   transition: color .25s ease;
-  line-height: 1.25;
+  line-height: 1.2;
   text-align: center;
-  max-width: 100%;
+  white-space: nowrap;
+  max-width: none;
 }
 
 .meet-ingredient:hover,
@@ -1691,7 +1713,7 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 .meet-ingredient:focus-visible .meet-ingredient-thumb {
   border-color: rgba(232, 255, 58, .75);
   box-shadow: 0 14px 30px rgba(0, 0, 0, .5), 0 0 28px rgba(232, 255, 58, .22);
-  transform: scale(1.05);
+  transform: none;
 }
 
 .meet-ingredient:hover .meet-ingredient-thumb img,
@@ -2647,13 +2669,23 @@ select {
   }
   .meet-ingredients {
     justify-content: center;
-    flex-wrap: wrap;
-    overflow: hidden;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
     padding: 24px 12px 20px;
+    -webkit-overflow-scrolling: touch;
   }
   .meet-ingredient {
-    width: clamp(64px, 14vw, 88px);
-    padding: 8px 6px;
+    width: clamp(68px, 16vw, 96px);
+    padding: 8px 2px;
+  }
+  .meet-ingredient-thumb {
+    width: clamp(52px, 12vw, 68px);
+    height: clamp(52px, 12vw, 68px);
+  }
+  .meet-ingredient-label {
+    font-size: .54rem;
+    letter-spacing: .06em;
   }
   .meet .showcase-product {
     width: min(88vw, 480px);
