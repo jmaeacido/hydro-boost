@@ -2286,7 +2286,7 @@ select {
 .product-images {
   align-self: stretch;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
 .spin-product {
@@ -2295,7 +2295,7 @@ select {
   height: auto;
   max-height: calc(100% - 92px);
   object-fit: contain;
-  object-position: top center;
+  object-position: center;
   filter: drop-shadow(0 20px 48px rgba(0, 0, 0, .55));
 }
 .product {
