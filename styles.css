@@ -2299,7 +2299,14 @@ select {
   filter: drop-shadow(0 20px 48px rgba(0, 0, 0, .55));
 }
 .product {
-  align-items: start;
+  min-height: 100svh;
+  height: 100svh;
+  max-height: 100svh;
+  align-items: center;
+  box-sizing: border-box;
+  padding-top: clamp(48px, 8svh, 72px);
+  padding-bottom: clamp(40px, 6svh, 56px);
+  overflow: hidden;
 }
 .buy-panel { padding: 28px; position: sticky; top: 20px; border-left: 3px solid var(--orange); }
 .flavor { width: fit-content; margin: 16px 0; }
@@ -2683,6 +2690,13 @@ select {
     max-height: none;
     align-content: center;
   }
+  .product {
+    min-height: 100svh;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    align-content: center;
+  }
   .hero-bg-video,
   .hero-bg-img {
     object-position: center 32%;
@@ -2825,6 +2839,13 @@ select {
     padding-inline: 16px;
     padding-bottom: max(72px, calc(48px + env(safe-area-inset-bottom, 0px)));
     gap: 18px;
+  }
+  .product {
+    min-height: 100svh;
+    height: auto;
+    max-height: none;
+    padding-inline: 16px;
+    padding-bottom: max(48px, calc(40px + env(safe-area-inset-bottom, 0px)));
   }
   .hero .eyebrow {
     letter-spacing: .18em;
