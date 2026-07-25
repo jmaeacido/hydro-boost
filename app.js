@@ -96,15 +96,34 @@ if (heroInteractive) {
   const defaultName = formulaName?.textContent || "";
   const defaultCopy = formulaCopy?.textContent || "";
 
+  function renderFormulaStudy(button) {
+    if (!formulaStudy) return;
+    const study = button?.dataset.study || "";
+    const studyUrl = button?.dataset.studyUrl || "";
+    formulaStudy.replaceChildren();
+    if (!study) {
+      formulaStudy.hidden = true;
+      return;
+    }
+    formulaStudy.append("Study: ");
+    if (studyUrl) {
+      const link = document.createElement("a");
+      link.href = studyUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = study;
+      formulaStudy.append(link);
+    } else {
+      formulaStudy.append(study);
+    }
+    formulaStudy.hidden = false;
+  }
+
   function setFormulaPanel(button) {
     if (!formulaName || !formulaCopy || !button) return;
     formulaName.textContent = button.dataset.name || defaultName;
     formulaCopy.textContent = button.dataset.desc || defaultCopy;
-    if (formulaStudy) {
-      const study = button.dataset.study || "";
-      formulaStudy.textContent = study ? `Study: ${study}` : "";
-      formulaStudy.hidden = !study;
-    }
+    renderFormulaStudy(button);
     heroInteractive.classList.add("has-selection");
   }
 
@@ -113,7 +132,7 @@ if (heroInteractive) {
     formulaName.textContent = defaultName;
     formulaCopy.textContent = defaultCopy;
     if (formulaStudy) {
-      formulaStudy.textContent = "";
+      formulaStudy.replaceChildren();
       formulaStudy.hidden = true;
     }
     heroInteractive.classList.remove("has-selection");
@@ -135,11 +154,9 @@ if (heroInteractive) {
     heroIngredients.forEach((button) => {
       formulaName.textContent = button.dataset.name || defaultName;
       formulaCopy.textContent = button.dataset.desc || defaultCopy;
-      if (formulaStudy) {
-        const study = button.dataset.study || "";
-        formulaStudy.textContent = study ? `Study: ${study}` : "";
-        formulaStudy.hidden = !study;
-        if (study) tallestStudy = Math.max(tallestStudy, formulaStudy.offsetHeight);
+      renderFormulaStudy(button);
+      if (formulaStudy && !formulaStudy.hidden) {
+        tallestStudy = Math.max(tallestStudy, formulaStudy.offsetHeight);
       }
       tallestPanel = Math.max(tallestPanel, formulaPanel.offsetHeight);
     });
@@ -147,7 +164,7 @@ if (heroInteractive) {
     formulaName.textContent = defaultName;
     formulaCopy.textContent = defaultCopy;
     if (formulaStudy) {
-      formulaStudy.textContent = "";
+      formulaStudy.replaceChildren();
       formulaStudy.hidden = true;
       if (tallestStudy > 0) formulaStudy.style.minHeight = `${tallestStudy}px`;
     }
@@ -192,7 +209,7 @@ if (heroInteractive) {
 
   heroInteractive.addEventListener("click", (event) => {
     if (!touchMode.matches) return;
-    if (event.target.closest(".hero-ingredient")) return;
+    if (event.target.closest(".hero-ingredient, .hero-formula-study a")) return;
     heroInteractive.classList.toggle("is-exploring");
     heroIngredients.forEach((item) => item.classList.remove("is-focused"));
     resetFormulaPanel();
