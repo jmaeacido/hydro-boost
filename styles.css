@@ -195,6 +195,209 @@ button, .button, .cta-chip, .sticky-buy, .hero-ingredient, .meet-ingredient, .in
   .section-bg-video { display: none; }
 }
 
+/* Responsive hardening: keep every component inside its layout at any viewport. */
+html {
+  overflow-x: clip;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+main,
+.section,
+.section > *,
+.hero-copy,
+.section-head,
+.meet-copy,
+.science-copy,
+.calc-copy,
+.buy-panel,
+.footer-grid > * {
+  min-width: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+blockquote,
+summary,
+.button,
+.cta-chip,
+.cta-link {
+  overflow-wrap: anywhere;
+}
+
+video,
+canvas,
+svg,
+iframe {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .hero-copy,
+  .section-head,
+  .meet-copy,
+  .science-copy,
+  .calc-copy,
+  .final-copy {
+    width: 100%;
+  }
+
+  .hero-badges {
+    flex-wrap: wrap;
+  }
+
+  .section-foot,
+  .conversion-band-inner {
+    max-width: 100%;
+  }
+
+  .review-shell {
+    min-width: 0;
+  }
+
+  .review-card,
+  .review-shell > * {
+    min-width: 0;
+  }
+
+  .footer-form-row {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 360px) {
+  .section {
+    padding-inline: 10px;
+  }
+
+  .hero {
+    padding-inline: 12px;
+  }
+
+  .hero h1,
+  h1 {
+    font-size: clamp(2rem, 12vw, 2.65rem);
+    letter-spacing: .035em;
+  }
+
+  .hero .hero-badges span {
+    padding-inline: 7px;
+    font-size: .56rem;
+  }
+
+  .hero-stats {
+    gap: 5px;
+  }
+
+  .stat-block {
+    padding-inline: 3px;
+  }
+
+  .stat-block span {
+    font-size: .49rem;
+    letter-spacing: .035em;
+  }
+
+  .in-motion .hero-product {
+    width: calc(100vw - 12px);
+  }
+
+  .hero-ingredients {
+    inset-inline: 0;
+  }
+
+  .hero-ingredient {
+    width: clamp(54px, 17vw, 66px);
+  }
+
+  .hero-ingredient-name {
+    max-width: 72px;
+    font-size: .45rem;
+    padding-inline: 4px;
+  }
+
+  .hero-ingredient--cordyceps,
+  .hero-ingredient--maca { left: 1%; }
+  .hero-ingredient--sodium,
+  .hero-ingredient--potassium { right: 1%; }
+
+  .problem .situation-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .compare-row {
+    min-width: 440px;
+  }
+
+  .review-shell {
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    padding: 12px 6px;
+  }
+
+  .carousel-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .footer-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-form-row .button {
+    width: 100%;
+  }
+}
+
+/* Phones and tablets held sideways need flow, not viewport-height clipping. */
+@media (max-height: 560px) and (max-width: 980px) {
+  .hero,
+  .product,
+  .final-cta {
+    min-height: 0;
+    height: auto;
+  }
+
+  .hero {
+    padding-top: 24px;
+    padding-bottom: 48px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .hero-stats,
+  .hero-badges {
+    display: none;
+  }
+
+  .in-motion,
+  .meet {
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+}
+
+@media (min-width: 1800px) {
+  :root { --max: 1560px; }
+
+  .section-head,
+  .hero-copy {
+    max-width: 720px;
+  }
+}
+
 .hero {
   position: relative;
   isolation: isolate;
@@ -3315,4 +3518,319 @@ select {
   .hero-product-visual {
     animation: none;
   }
+}
+
+/* Final cascade guards for edge-size viewports. */
+@media (max-width: 360px) {
+  .section { padding-inline: 10px; }
+  .hero { padding-inline: 12px; }
+  .hero h1,
+  h1 { font-size: clamp(2rem, 12vw, 2.65rem); letter-spacing: .035em; }
+  .in-motion .hero-product { width: calc(100vw - 12px); }
+  .hero-ingredients { inset-inline: 0; }
+  .hero-ingredient { width: clamp(54px, 17vw, 66px); }
+  .hero-ingredient--cordyceps,
+  .hero-ingredient--maca { left: 1%; }
+  .hero-ingredient--sodium,
+  .hero-ingredient--potassium { right: 1%; }
+  .problem .situation-grid { grid-template-columns: 1fr; grid-template-rows: none; }
+  .review-shell { grid-template-columns: 34px minmax(0, 1fr) 34px; padding: 12px 6px; }
+  .carousel-btn { width: 34px; height: 34px; }
+  .footer-form-row { grid-template-columns: 1fr; }
+  .footer-form-row .button { width: 100%; }
+}
+
+@media (max-height: 560px) and (max-width: 980px) {
+  .hero,
+  .product,
+  .final-cta { min-height: 0; height: auto; }
+  .hero { padding-top: 24px; padding-bottom: 48px; }
+  .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+  .hero-stats,
+  .hero-badges { display: none; }
+  .in-motion,
+  .meet { padding-top: 32px; padding-bottom: 32px; }
+}
+
+@media (min-width: 1800px) {
+  :root { --max: 1560px; }
+  .section-head,
+  .hero-copy { max-width: 720px; }
+}
+
+/* Mobile composition: designed for touch and comfortable reading. */
+@media (max-width: 640px) {
+  body { width: 100%; overflow-x: clip; }
+
+  .section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  .section-head {
+    margin-bottom: 26px;
+  }
+
+  .section-head h2,
+  .meet h2,
+  .science-copy h2,
+  .calc-copy h2,
+  .buy-panel h2,
+  .final-cta h2 {
+    font-size: clamp(1.75rem, 8.5vw, 2.35rem);
+    line-height: 1.02;
+    letter-spacing: .035em;
+    text-wrap: balance;
+  }
+
+  .section-dek,
+  .meet-copy > p:not([class]),
+  .science-copy > p,
+  .calc-copy > p {
+    font-size: .95rem;
+    line-height: 1.6;
+  }
+
+  .hero {
+    min-height: max(720px, 100svh);
+    justify-content: center;
+  }
+
+  .hero h1 {
+    max-width: 100%;
+    font-size: clamp(2.35rem, 10.8vw, 3rem);
+    line-height: .93;
+    letter-spacing: .025em;
+    overflow-wrap: normal;
+    word-break: normal;
+    text-wrap: balance;
+  }
+
+  .hero h1 .h1-line,
+  .hero h1 em {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .hero-sub {
+    max-width: 34ch;
+    font-size: .94rem;
+    line-height: 1.55;
+  }
+
+  .in-motion .hero-formula-panel {
+    min-height: 150px;
+  }
+
+  .problem {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  .problem .situation-grid,
+  .situation-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    gap: 10px;
+  }
+
+  .problem .situation {
+    min-height: 104px;
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    align-items: stretch;
+  }
+
+  .problem .icon-stage {
+    width: 92px;
+    height: 100%;
+    min-height: 102px;
+    border-right: 1px solid rgba(232, 255, 58, .1);
+    border-bottom: 0;
+  }
+
+  .problem .situation-copy {
+    justify-content: center;
+    padding: 14px 34px 14px 0;
+  }
+
+  .problem .situation h3 {
+    margin: 0 0 5px;
+    font-size: 1.05rem;
+  }
+
+  .problem .situation p {
+    display: block;
+    padding-bottom: 0;
+    font-size: .78rem;
+    line-height: 1.45;
+  }
+
+  .problem .situation-num {
+    top: 8px;
+    right: 8px;
+  }
+
+  .problem .section-foot {
+    margin-top: 24px;
+  }
+
+  .meet {
+    padding-top: 48px;
+    padding-bottom: 56px;
+  }
+
+  .meet-grid { gap: 10px; }
+
+  .meet .showcase-product {
+    width: min(72vw, 280px);
+    height: min(38svh, 300px);
+    margin-inline: auto;
+  }
+
+  .meet-copy { overflow: visible; }
+
+  .meet-ingredients {
+    justify-content: flex-start;
+    gap: 4px;
+    margin-inline: -16px;
+    padding: 18px 16px 14px;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+  }
+
+  .meet-ingredients::-webkit-scrollbar { display: none; }
+
+  .meet-ingredient {
+    width: 76px;
+    scroll-snap-align: start;
+  }
+
+  .meet-ingredient-panel {
+    text-align: left;
+    padding: 18px;
+  }
+
+  .meet-ingredient-about {
+    display: block;
+    overflow: visible;
+  }
+
+  .comparison .section-head { text-align: left; }
+
+  .compare-table {
+    margin-inline: -16px;
+    padding-inline: 16px;
+    border-inline: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232, 255, 58, .55) rgba(255, 255, 255, .08);
+  }
+
+  .compare-row {
+    min-width: 610px;
+    grid-template-columns: 142px repeat(3, 156px);
+  }
+
+  .compare-row > * {
+    padding: 14px 12px;
+  }
+
+  .compare-row > :first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #11130f;
+    box-shadow: 8px 0 16px rgba(0, 0, 0, .28);
+  }
+
+  .inside {
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .inside .section-head { text-align: center; }
+
+  .inside .ingredient-grid {
+    display: flex;
+    gap: 12px;
+    margin-inline: -16px;
+    padding: 2px 16px 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+  }
+
+  .inside .ingredient-grid::-webkit-scrollbar { display: none; }
+
+  .inside .ingredient {
+    flex: 0 0 min(76vw, 290px);
+    padding: 14px;
+    scroll-snap-align: center;
+  }
+
+  .inside .ingredient-photo {
+    aspect-ratio: 4 / 3;
+    margin-bottom: 12px;
+  }
+
+  .inside .ingredient .dose { font-size: 1.35rem; }
+
+  .ingredient-panel {
+    margin-top: 14px;
+    text-align: left;
+  }
+
+  .gallery-card,
+  .gallery-card.wide,
+  .gallery figure,
+  .gallery .wide {
+    min-height: 280px;
+  }
+
+  .split-grid article,
+  .calc-panel,
+  .buy-panel,
+  .electrolyte-bars {
+    padding: 18px;
+  }
+
+  .product-images { width: min(62vw, 250px); }
+
+  .product {
+    gap: 22px;
+    padding-top: 48px;
+    padding-bottom: 56px;
+  }
+
+  .sticky-buy {
+    left: auto;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    width: auto;
+    min-width: 132px;
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: .76rem;
+    letter-spacing: .1em;
+    border: 1px solid rgba(10, 10, 10, .25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+  }
+
+  .final-cta { padding-bottom: 72px; }
+  .site-footer { padding-bottom: 84px; }
+}
+
+@media (max-width: 360px) {
+  .problem .situation {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+  .problem .icon-stage { width: 78px; }
+  .inside .ingredient { flex-basis: 82vw; }
+  .sticky-buy { min-width: 120px; padding-inline: 15px; }
 }
