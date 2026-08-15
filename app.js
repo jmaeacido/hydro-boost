@@ -92,6 +92,7 @@ if (heroInteractive) {
   const formulaName = heroInteractive.querySelector("[data-hero-formula-name]");
   const formulaCopy = heroInteractive.querySelector("[data-hero-formula-copy]");
   const formulaStudy = heroInteractive.querySelector("[data-hero-formula-study]");
+  const heroOrbitSurface = heroInteractive.closest(".in-motion")?.querySelector("[data-hero-orbit]");
   const touchMode = window.matchMedia("(hover: none)");
   const defaultName = formulaName?.textContent || "";
   const defaultCopy = formulaCopy?.textContent || "";
@@ -229,7 +230,11 @@ if (heroInteractive) {
   });
 
   document.addEventListener("click", (event) => {
-    if (!touchMode.matches || heroInteractive.contains(event.target)) return;
+    if (
+      !touchMode.matches ||
+      heroInteractive.contains(event.target) ||
+      heroOrbitSurface?.contains(event.target)
+    ) return;
     heroInteractive.classList.remove("is-exploring");
     heroIngredients.forEach((item) => item.classList.remove("is-focused"));
     resetFormulaPanel();
