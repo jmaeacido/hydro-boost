@@ -210,7 +210,7 @@ if (heroInteractive) {
 
   heroInteractive.addEventListener("click", (event) => {
     if (!touchMode.matches) return;
-    if (event.target.closest(".hero-ingredient, .hero-formula-study a")) return;
+    if (event.target.closest(".hero-product-stage, .hero-ingredient, .hero-formula-study a")) return;
     heroInteractive.classList.toggle("is-exploring");
     heroIngredients.forEach((item) => item.classList.remove("is-focused"));
     resetFormulaPanel();

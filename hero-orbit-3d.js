@@ -435,12 +435,47 @@ export function initHeroOrbit3d(container, options = {}) {
     return nearestIngredient(maxDist);
   }
 
+  function renderFormulaSelection(button) {
+    if (!button || !exploreRoot) return;
+    const name = exploreRoot.querySelector("[data-hero-formula-name]");
+    const copy = exploreRoot.querySelector("[data-hero-formula-copy]");
+    const study = exploreRoot.querySelector("[data-hero-formula-study]");
+
+    if (name) name.textContent = button.dataset.name || "Explore the formula";
+    if (copy) copy.textContent = button.dataset.desc || "";
+    if (study) {
+      const studyText = button.dataset.study || "";
+      const studyUrl = button.dataset.studyUrl || "";
+      study.replaceChildren();
+      study.hidden = !studyText;
+      if (studyText) {
+        study.append("Study: ");
+        if (studyUrl) {
+          const link = document.createElement("a");
+          link.href = studyUrl;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = studyText;
+          study.append(link);
+        } else {
+          study.append(studyText);
+        }
+      }
+    }
+    exploreRoot.classList.add("has-selection", "is-exploring");
+  }
+
   function selectIngredient(key) {
     if (!key) return;
     if (key !== lockedKey) {
       lockedKey = key;
       const button = ingredientButtons.find((item) => item.dataset.ingredientKey === key);
-      if (button) onIngredientFocus(button);
+      if (button) {
+        const liveFocus = window.__heroOrbitBridge?.focus;
+        if (typeof liveFocus === "function") liveFocus(button);
+        else onIngredientFocus(button);
+        renderFormulaSelection(button);
+      }
       setFocusedIngredient(key);
     }
     snapIngredientToFront(key);
@@ -463,7 +498,18 @@ export function initHeroOrbit3d(container, options = {}) {
     dragMoved = false;
     isDragging = false;
     dragVelocity = 0;
-    stage.setPointerCapture?.(event.pointerId);
+    try {
+      stage.setPointerCapture?.(event.pointerId);
+    } catch {
+      // Some mobile browsers expose pointer capture but reject it for touch input.
+    }
+
+    // Mobile browsers can convert the gesture to pointercancel because the stage
+    // allows vertical scrolling. Commit a direct orb tap before that can happen.
+    if (touchMode.matches) {
+      const key = pickIngredient();
+      if (key) selectIngredient(key);
+    }
   }
 
   function handlePointerMove(event) {
@@ -506,7 +552,11 @@ export function initHeroOrbit3d(container, options = {}) {
     const wasDrag = dragMoved;
     isDragging = false;
     activePointerId = null;
-    stage.releasePointerCapture?.(event.pointerId);
+    try {
+      stage.releasePointerCapture?.(event.pointerId);
+    } catch {
+      // Selection must still complete if the pointer was implicitly released.
+    }
 
     if (!wasDrag) {
       selectIngredient(pickIngredient());
