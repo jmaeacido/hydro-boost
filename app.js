@@ -221,15 +221,10 @@ if (heroInteractive) {
 
     button.addEventListener("click", () => {
       if (!touchMode.matches) return;
-      const isFocused = button.classList.contains("is-focused");
       heroIngredients.forEach((item) => item.classList.remove("is-focused"));
       heroInteractive.classList.add("is-exploring");
-      if (!isFocused) {
-        button.classList.add("is-focused");
-        setFormulaPanel(button);
-      } else {
-        resetFormulaPanel();
-      }
+      button.classList.add("is-focused");
+      setFormulaPanel(button);
     });
   });
 

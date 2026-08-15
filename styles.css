@@ -13,6 +13,8 @@
   --card: rgba(40, 40, 38, .92);
   --shadow: 0 20px 60px rgba(0, 0, 0, .55);
   --max: 1180px;
+  --wix-top-bar-height: clamp(84px, 13.5vw, 132px);
+  --section-viewport-height: calc(100svh - var(--wix-top-bar-height));
   --display: "Trajan Pro", Georgia, "Times New Roman", serif;
   --body: "Barlow", ui-sans-serif, system-ui, sans-serif;
   --label-serif: "Trajan Pro", Georgia, "Times New Roman", serif;
@@ -408,7 +410,7 @@ textarea {
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: clamp(16px, 3svh, 32px);
-  padding-top: clamp(48px, 8svh, 72px);
+  padding-top: clamp(112px, 14svh, 144px);
   padding-bottom: clamp(40px, 6svh, 56px);
   box-sizing: border-box;
 }
@@ -1234,9 +1236,9 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 .in-motion {
   position: relative;
   isolation: isolate;
-  min-height: 100svh;
-  height: 100svh;
-  max-height: 100svh;
+  min-height: var(--section-viewport-height);
+  height: var(--section-viewport-height);
+  max-height: var(--section-viewport-height);
   display: flex;
   align-items: center;
   padding-top: clamp(40px, 5svh, 72px);
@@ -1387,9 +1389,9 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
     linear-gradient(180deg, rgba(40, 40, 38, .84) 0%, rgba(40, 40, 38, .74) 48%, rgba(40, 40, 38, .9) 100%);
 }
 .problem {
-  min-height: 100svh;
-  height: 100svh;
-  max-height: 100svh;
+  min-height: var(--section-viewport-height);
+  height: var(--section-viewport-height);
+  max-height: var(--section-viewport-height);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1739,9 +1741,9 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
 }
 
 .meet {
-  min-height: 100svh;
-  height: 100svh;
-  max-height: 100svh;
+  min-height: var(--section-viewport-height);
+  height: var(--section-viewport-height);
+  max-height: var(--section-viewport-height);
   display: flex;
   align-items: center;
   padding-top: clamp(36px, 5svh, 56px);
@@ -1766,7 +1768,7 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   align-self: center;
   width: min(100%, clamp(300px, 44vw, 600px));
   height: clamp(300px, 78svh, 760px);
-  max-height: calc(100svh - 48px);
+  max-height: calc(var(--section-viewport-height) - 48px);
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -1781,6 +1783,7 @@ p { color: var(--muted); line-height: 1.6; font-weight: 500; }
   max-height: 100%;
   object-fit: contain;
   object-position: left center;
+  box-shadow: none;
   filter: drop-shadow(0 28px 56px rgba(0, 0, 0, .6));
 }
 
@@ -2538,9 +2541,9 @@ select {
   filter: drop-shadow(0 20px 48px rgba(0, 0, 0, .55));
 }
 .product {
-  min-height: 100svh;
-  height: 100svh;
-  max-height: 100svh;
+  min-height: var(--section-viewport-height);
+  height: var(--section-viewport-height);
+  max-height: var(--section-viewport-height);
   align-items: center;
   box-sizing: border-box;
   padding-top: clamp(48px, 8svh, 72px);
@@ -2974,7 +2977,7 @@ select {
     align-content: center;
   }
   .product {
-    min-height: 100svh;
+    min-height: var(--section-viewport-height);
     height: auto;
     max-height: none;
     overflow: visible;
@@ -3124,7 +3127,7 @@ select {
     gap: 18px;
   }
   .product {
-    min-height: 100svh;
+    min-height: var(--section-viewport-height);
     height: auto;
     max-height: none;
     padding-inline: 16px;
@@ -3416,7 +3419,7 @@ select {
   .meet .showcase-product {
     width: min(100%, clamp(240px, 40vw, 520px));
     height: clamp(240px, 60svh, 580px);
-    max-height: calc(100svh - 72px);
+    max-height: calc(var(--section-viewport-height) - 72px);
     justify-self: start;
   }
   .meet-ingredients {
