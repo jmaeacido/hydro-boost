@@ -15,28 +15,13 @@
   --max: 1180px;
   --wix-top-bar-height: clamp(84px, 13.5vw, 132px);
   --section-viewport-height: calc(100svh - var(--wix-top-bar-height));
-  --display: "Trajan Pro", Georgia, "Times New Roman", serif;
-  --body: "Barlow", ui-sans-serif, system-ui, sans-serif;
-  --label-serif: "Trajan Pro", Georgia, "Times New Roman", serif;
-  --label-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --display: "Michroma", ui-sans-serif, system-ui, sans-serif;
+  --body: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --label-serif: "Nexa", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --label-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --gauge-c: 327;
 }
 
-@font-face {
-  font-family: "Trajan Pro";
-  src: url("assets/fonts/trajan-pro/TrajanPro-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Trajan Pro";
-  src: url("assets/fonts/trajan-pro/TrajanPro-Bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -2684,40 +2669,32 @@ select {
   align-items: start;
 }
 
-.footer-accent {
+.footer-brand-lead {
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
+  max-width: 30ch;
+}
+
+.footer-brand-logo {
   display: block;
-  width: 52px;
-  height: 4px;
-  margin-bottom: 22px;
-  background: var(--lime);
-}
-
-.footer-brand-title {
-  margin: 0 0 10px;
-  font-family: var(--display);
-  font-size: clamp(2.4rem, 4vw, 3.4rem);
-  line-height: .95;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: #ebe9e5;
-}
-
-.footer-brand-tag {
-  margin: 0 0 18px;
-  font-family: var(--display);
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-  line-height: 1;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--lime);
+  grid-row: 1;
+  width: 100%;
+  height: auto;
+  margin: 0 0 22px 0;
+  mix-blend-mode: lighten;
 }
 
 .footer-brand-copy {
+  grid-row: 2;
   margin: 0;
-  max-width: 30ch;
   color: rgba(235, 233, 229, .88);
   font-size: 1rem;
   line-height: 1.55;
+}
+
+.footer-brand-copy-text {
+  display: inline-block;
+  max-width: 30ch;
 }
 
 .footer-social {
@@ -3297,7 +3274,8 @@ select {
       max(96px, calc(72px + env(safe-area-inset-bottom, 0px)));
   }
   .footer-grid { grid-template-columns: 1fr; gap: 36px; }
-  .footer-brand-copy { max-width: none; }
+  .footer-brand-lead { max-width: none; }
+  .footer-brand-copy-text { max-width: 36ch; }
   .scroll-cue { display: none; }
 }
 
