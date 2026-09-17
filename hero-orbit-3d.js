@@ -14,11 +14,11 @@ function createGltfLoader() {
   dracoLoader.setDecoderPath(DRACO_DECODER_PATH);
   return new GLTFLoader().setDRACOLoader(dracoLoader);
 }
-// Full-bleed in-motion section backdrop (dark green + grid), replaces CSS.
-const PAGE_BG_HEX = "#0b1209";
-const PAGE_BG = 0x0b1209;
-const PAGE_GRID_H = "rgba(232,255,58,0.035)";
-const PAGE_GRID_V = "rgba(232,255,58,0.025)";
+// Full-bleed in-motion section backdrop (neutral charcoal + grid), matches CSS fallback.
+const PAGE_BG_HEX = "#111111";
+const PAGE_BG = 0x111111;
+const PAGE_GRID_H = "rgba(235,233,229,0.03)";
+const PAGE_GRID_V = "rgba(235,233,229,0.02)";
 // The source scene keeps spare gummies parked high above the bottle (physics-sim leftovers).
 const STRAY_GUMMY_MIN_Y = 6;
 const MODEL_TARGET_HEIGHT = 2.55;
